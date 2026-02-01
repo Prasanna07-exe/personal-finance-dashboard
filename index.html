@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Personal Finance Decision Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div class="dashboard">
+        <header class="top-header">
+            <div class="title-section">
+                <h1>Personal Finance Dashboard</h1>
+                <p>Smart insights for better financial decisions</p>
+            </div>
+
+            <div class="toggle-section">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    🌙 Dark Mode
+                </button>
+            </div>
+        </header>
+
+        <section class="cards">
+            <div class="card income">
+                <h3>Total Income</h3>
+                <p id="incomeValue">₹0</p>
+            </div>
+            <div class="card expense">
+                <h3>Total Expenses</h3>
+                <p id="expenseValue">₹0</p>
+            </div>
+            <div class="card savings">
+                <h3>Total Savings</h3>
+                <p id="savingsValue">₹0</p>
+            </div>
+        </section>
+
+        <section class="inputs">
+            <div class="input-box">
+                <h3>Add Income</h3>
+                <input type="number" id="incomeInput" placeholder="Enter monthly income">
+                <button onclick="addIncome()">Add Income</button>
+            </div>
+
+            <div class="input-box">
+                <h3>Add Expense</h3>
+                <select id="category">
+                    <option>Food</option>
+                    <option>Rent</option>
+                    <option>Travel</option>
+                    <option>Shopping</option>
+                    <option>Others</option>
+                </select>
+                <input type="number" id="expenseInput" placeholder="Enter expense amount">
+                <button onclick="addExpense()">Add Expense</button>
+            </div>
+        </section>
+
+        <section class="charts">
+            <div class="chart-box">
+                <h3>Expense Distribution</h3>
+                <canvas id="expenseChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>Income vs Expense</h3>
+                <canvas id="summaryChart"></canvas>
+            </div>
+        </section>
+
+        <section class="insights">
+            <h2>Investment Insight</h2>
+            <p id="insightText">Add income and expenses to get insights.</p>
+        </section>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
