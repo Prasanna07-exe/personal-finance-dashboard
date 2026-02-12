@@ -1,12 +1,16 @@
 const STORAGE_KEY = 'personal_finance_dashboard_state';
 const SAVINGS_GOAL_RATIO = 30;
 
-let state = {
-    income: 0,
-    budget: 0,
-    expenseEntries: [],
-    theme: 'light'
-};
+function getDefaultState() {
+    return {
+        income: 0,
+        budget: 0,
+        expenseEntries: [],
+        theme: 'light'
+    };
+}
+
+let state = getDefaultState();
 
 const expenseCtx = document.getElementById('expenseChart');
 const summaryCtx = document.getElementById('summaryChart');
@@ -38,25 +42,38 @@ function initializeCharts() {
     });
 }
 
+function normalizeExpenseEntries(entries) {
+    if (!Array.isArray(entries)) return [];
+
+    return entries
+        .map((entry, index) => ({
+            id: Number(entry.id) || (Date.now() + index),
+            category: String(entry.category || 'Others'),
+            amount: Number(entry.amount) || 0
+        }))
+        .filter((entry) => entry.amount > 0);
+}
+
+function normalizeState(rawState) {
+    return {
+        income: Math.max(0, Number(rawState?.income) || 0),
+        budget: Math.max(0, Number(rawState?.budget) || 0),
+        expenseEntries: normalizeExpenseEntries(rawState?.expenseEntries),
+        theme: rawState?.theme === 'dark' ? 'dark' : 'light'
+    };
+}
+
 function loadState() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
+        if (!raw) {
+            state = getDefaultState();
+            return;
+        }
 
-        const parsed = JSON.parse(raw);
-        state = {
-            income: Number(parsed.income) || 0,
-            budget: Number(parsed.budget) || 0,
-            expenseEntries: Array.isArray(parsed.expenseEntries) ? parsed.expenseEntries : [],
-            theme: parsed.theme === 'dark' ? 'dark' : 'light'
-        };
+        state = normalizeState(JSON.parse(raw));
     } catch (error) {
-        state = {
-            income: 0,
-            budget: 0,
-            expenseEntries: [],
-            theme: 'light'
-        };
+        state = getDefaultState();
     }
 }
 
@@ -226,6 +243,111 @@ function calculateHealthScore(income, totalExpense, savings) {
     return Math.max(0, Math.min(100, Math.round(weighted)));
 }
 
+function formatDateForFileName(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function downloadReport() {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        window.alert('PDF library not loaded. Please refresh and try again.');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const now = new Date();
+    const reportDate = now.toLocaleDateString();
+    const fileDate = formatDateForFileName(now);
+
+    const income = state.income;
+    const totalExpense = getTotalExpense();
+    const savings = income - totalExpense;
+    const savingsPercent = income > 0 ? (savings / income) * 100 : 0;
+    const healthScore = calculateHealthScore(income, totalExpense, savings);
+    const expensesByCategory = getExpensesByCategory();
+    const insightText = document.getElementById('insightText').innerText;
+
+    let y = 18;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.text('Personal Finance Report', 14, y);
+
+    y += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.text(`Generated on: ${reportDate}`, 14, y);
+
+    y += 12;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text('Summary', 14, y);
+
+    y += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.text(`Income: INR ${income.toFixed(2)}`, 14, y);
+    y += 7;
+    doc.text(`Total Expenses: INR ${totalExpense.toFixed(2)}`, 14, y);
+    y += 7;
+    doc.text(`Savings: INR ${savings.toFixed(2)}`, 14, y);
+    y += 7;
+    doc.text(`Savings %: ${savingsPercent.toFixed(2)}%`, 14, y);
+    y += 7;
+    doc.text(`Financial Health Score: ${healthScore}/100`, 14, y);
+
+    y += 12;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text('Category Breakdown', 14, y);
+
+    y += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+
+    const categories = Object.keys(expensesByCategory);
+    if (categories.length === 0) {
+        doc.text('No expenses recorded.', 14, y);
+        y += 7;
+    } else {
+        categories.forEach((category) => {
+            const value = expensesByCategory[category];
+            const percentage = totalExpense > 0 ? (value / totalExpense) * 100 : 0;
+
+            if (y > 272) {
+                doc.addPage();
+                y = 18;
+            }
+
+            doc.text(`${category}: INR ${value.toFixed(2)} (${percentage.toFixed(2)}%)`, 14, y);
+            y += 7;
+        });
+    }
+
+    y += 6;
+    if (y > 270) {
+        doc.addPage();
+        y = 18;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text('Investment Insight', 14, y);
+
+    y += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+
+    const wrappedInsight = doc.splitTextToSize(insightText, 180);
+    doc.text(wrappedInsight, 14, y);
+
+    doc.save(`Finance_Report_${fileDate}.pdf`);
+}
+
 function updateFinancialHealthScore(income, totalExpense, savings) {
     const score = calculateHealthScore(income, totalExpense, savings);
     const scoreValue = document.getElementById('healthScoreValue');
@@ -344,12 +466,8 @@ function resetDashboard() {
     const shouldReset = window.confirm('Reset all income, expenses, budget, and insights?');
     if (!shouldReset) return;
 
-    state = {
-        income: 0,
-        budget: 0,
-        expenseEntries: [],
-        theme: document.body.classList.contains('dark') ? 'dark' : 'light'
-    };
+    state = getDefaultState();
+    state.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
 
     document.getElementById('incomeInput').value = '';
     document.getElementById('expenseInput').value = '';
@@ -379,8 +497,12 @@ function toggleTheme() {
     applyTheme();
 }
 
-loadState();
-initializeCharts();
-document.getElementById('budgetInput').value = state.budget || '';
-applyTheme();
-renderAll();
+function initializeApp() {
+    loadState();
+    initializeCharts();
+    document.getElementById('budgetInput').value = state.budget || '';
+    applyTheme();
+    renderAll();
+}
+
+initializeApp();

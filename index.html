@@ -7,6 +7,7 @@
     <title>Personal Finance Decision Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -21,6 +22,9 @@
             <div class="toggle-section">
                 <button class="theme-toggle" onclick="toggleTheme()">
                     🌙 Dark Mode
+                </button>
+                <button onclick="downloadReport()">
+                    Download Report
                 </button>
                 <button onclick="resetDashboard()">
                     Reset Dashboard
