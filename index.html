@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Finance Decision Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,12 +15,15 @@
         <header class="top-header">
             <div class="title-section">
                 <h1>Personal Finance Dashboard</h1>
-                <p>Smart insights for better financial decisions</p>
+                <p>Startup-grade money intelligence for smarter decisions</p>
             </div>
 
             <div class="toggle-section">
                 <button class="theme-toggle" onclick="toggleTheme()">
                     🌙 Dark Mode
+                </button>
+                <button onclick="resetDashboard()">
+                    Reset Dashboard
                 </button>
             </div>
         </header>
@@ -36,6 +40,28 @@
             <div class="card savings">
                 <h3>Total Savings</h3>
                 <p id="savingsValue">₹0</p>
+            </div>
+        </section>
+
+        <section class="analytics-grid">
+            <div class="analytics-card health-card">
+                <h3>Financial Health Score</h3>
+                <div class="score-ring" id="healthRing" style="--score-angle: 0deg;">
+                    <div class="score-inner">
+                        <span id="healthScoreValue">0</span>
+                        <small>/100</small>
+                    </div>
+                </div>
+                <p id="healthScoreLabel">Add transactions to generate your score.</p>
+            </div>
+
+            <div class="analytics-card goal-card">
+                <h3>Savings Goal Progress</h3>
+                <p class="goal-caption">Target savings ratio: 30%</p>
+                <div class="goal-track">
+                    <div id="savingsGoalProgress" class="goal-fill"></div>
+                </div>
+                <p id="savingsGoalText">Add income to track your goal progress.</p>
             </div>
         </section>
 
@@ -58,6 +84,13 @@
                 <input type="number" id="expenseInput" placeholder="Enter expense amount">
                 <button onclick="addExpense()">Add Expense</button>
             </div>
+
+            <div class="input-box">
+                <h3>Monthly Budget</h3>
+                <input type="number" id="budgetInput" placeholder="Set monthly expense limit">
+                <button onclick="setBudget()">Set Budget</button>
+                <p id="budgetWarning"></p>
+            </div>
         </section>
 
         <section class="charts">
@@ -71,7 +104,17 @@
             </div>
         </section>
 
-        <section class="insights">
+        <section class="insights breakdown-section">
+            <h2>Expense Percentage Breakdown</h2>
+            <div id="expenseBreakdown"></div>
+        </section>
+
+        <section class="insights expense-list-section">
+            <h2>Expense List</h2>
+            <ul id="expenseList"></ul>
+        </section>
+
+        <section class="insights insight-section">
             <h2>Investment Insight</h2>
             <p id="insightText">Add income and expenses to get insights.</p>
         </section>
