@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +7,28 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <!-- NEW: Confetti for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- NEW: PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,{
+        'name': 'Personal Finance Dashboard',
+        'short_name': 'FinancePro',
+        'start_url': '.',
+        'display': 'standalone',
+        'background_color': '#edf2ff',
+        'theme_color': '#4f7cff',
+        'icons': [{'src': 'data:image/svg+xml;base64,...', 'sizes': '192x192', 'type': 'image/png'}]
+    }">
 </head>
 
 <body>
-
     <div class="dashboard">
+        <!-- === EXISTING HEADER (UNCHANGED) === -->
         <header class="top-header">
             <div class="title-section">
-                <h1>Personal Finance Dashboard</h1>
+                <h1>Personal Finance Decision Dashboard</h1>
                 <p>Startup-grade money intelligence for smarter decisions</p>
             </div>
-
             <div class="toggle-section">
                 <button class="theme-toggle" onclick="toggleTheme()">
                     🌙 Dark Mode
@@ -29,9 +39,14 @@
                 <button onclick="resetDashboard()">
                     Reset Dashboard
                 </button>
+                <!-- NEW: Quick Actions -->
+                <button onclick="showQuickTools()" title="EMI, Currency, Goals">
+                    🛠️ Tools
+                </button>
             </div>
         </header>
 
+        <!-- === EXISTING CARDS SECTION (UNCHANGED) === -->
         <section class="cards">
             <div class="card income">
                 <h3>Total Income</h3>
@@ -45,8 +60,14 @@
                 <h3>Total Savings</h3>
                 <p id="savingsValue">₹0</p>
             </div>
+            <!-- NEW: Net Worth Card -->
+            <div class="card networth" id="networthCard" style="display: none;">
+                <h3>Net Worth</h3>
+                <p id="netWorthValue">₹0</p>
+            </div>
         </section>
 
+        <!-- === EXISTING ANALYTICS (UNCHANGED) === -->
         <section class="analytics-grid">
             <div class="analytics-card health-card">
                 <h3>Financial Health Score</h3>
@@ -58,7 +79,6 @@
                 </div>
                 <p id="healthScoreLabel">Add transactions to generate your score.</p>
             </div>
-
             <div class="analytics-card goal-card">
                 <h3>Savings Goal Progress</h3>
                 <p class="goal-caption">Target savings ratio: 30%</p>
@@ -69,26 +89,25 @@
             </div>
         </section>
 
+        <!-- === EXISTING INPUTS (UNCHANGED + NEW) === -->
         <section class="inputs">
             <div class="input-box">
                 <h3>Add Income</h3>
                 <input type="number" id="incomeInput" placeholder="Enter monthly income">
                 <button onclick="addIncome()">Add Income</button>
             </div>
-
             <div class="input-box">
                 <h3>Add Expense</h3>
                 <select id="category">
-                    <option>Food</option>
-                    <option>Rent</option>
-                    <option>Travel</option>
-                    <option>Shopping</option>
-                    <option>Others</option>
+                    <!-- EXISTING CATEGORIES KEPT + NEW ONES ADDED -->
+                    <option>Food</option><option>Rent</option><option>Travel</option><option>Shopping</option><option>Others</option>
+                    <option>Utilities</option><option>Groceries</option><option>Transport</option><option>Entertainment</option>
+                    <option>Healthcare</option><option>Education</option><option>Debt</option><option>Insurance</option>
+                    <option>Subscriptions</option><option>Gifts</option><option>Maintenance</option>
                 </select>
                 <input type="number" id="expenseInput" placeholder="Enter expense amount">
                 <button onclick="addExpense()">Add Expense</button>
             </div>
-
             <div class="input-box">
                 <h3>Monthly Budget</h3>
                 <input type="number" id="budgetInput" placeholder="Set monthly expense limit">
@@ -97,6 +116,7 @@
             </div>
         </section>
 
+        <!-- === EXISTING CHARTS (UNCHANGED) + NEW CHARTS === -->
         <section class="charts">
             <div class="chart-box">
                 <h3>Expense Distribution</h3>
@@ -106,25 +126,134 @@
                 <h3>Income vs Expense</h3>
                 <canvas id="summaryChart"></canvas>
             </div>
+            <!-- NEW CHARTS -->
+            <div class="chart-box">
+                <h3>Cashflow Forecast</h3>
+                <canvas id="forecastChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>Budget vs Actual</h3>
+                <canvas id="budgetChart"></canvas>
+            </div>
         </section>
 
+        <!-- === EXISTING SECTIONS (UNCHANGED) === -->
         <section class="insights breakdown-section">
             <h2>Expense Percentage Breakdown</h2>
             <div id="expenseBreakdown"></div>
         </section>
-
         <section class="insights expense-list-section">
             <h2>Expense List</h2>
             <ul id="expenseList"></ul>
         </section>
-
         <section class="insights insight-section">
             <h2>Investment Insight</h2>
             <p id="insightText">Add income and expenses to get insights.</p>
         </section>
+
+        <!-- === NEW SECTIONS (COMpletely Added) === -->
+        
+        <!-- NEW: Transaction History -->
+        <section class="transactions">
+            <div class="section-header">
+                <h2>📊 Transaction History</h2>
+                <div class="transaction-controls">
+                    <input type="text" id="searchTransactions" placeholder="🔍 Search transactions...">
+                    <select id="filterCategory">
+                        <option value="">All Categories</option>
+                    </select>
+                    <button onclick="exportCSV()">📤 Export CSV</button>
+                    <button onclick="importCSV()" class="secondary">📥 Import CSV</button>
+                    <button onclick="showAddTransactionModal()">➕ New Transaction</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th><th>Category</th><th>Amount</th><th>Type</th><th>Notes</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <button onclick="monthlyReset()">🔄 Monthly Reset</button>
+                <span id="transactionCount">0 transactions</span>
+            </div>
+        </section>
+
+        <!-- NEW: Net Worth Tracker -->
+        <section class="net-worth-section">
+            <h2>💰 Net Worth Tracker</h2>
+            <div class="networth-inputs">
+                <div class="input-group">
+                    <label>Total Assets</label>
+                    <input type="number" id="assetsInput" placeholder="Cash, investments, property...">
+                </div>
+                <div class="input-group">
+                    <label>Total Liabilities</label>
+                    <input type="number" id="liabilitiesInput" placeholder="Loans, credit card debt...">
+                </div>
+                <button onclick="calculateNetWorth()">Calculate</button>
+            </div>
+            <canvas id="networthTrendChart" height="200"></canvas>
+        </section>
+
+        <!-- NEW: Goals Manager -->
+        <section class="goals-manager">
+            <div class="section-header">
+                <h2>🎯 Savings Goals</h2>
+                <button onclick="showGoalModal()">➕ Add Goal</button>
+            </div>
+            <div id="goalsList" class="goals-grid"></div>
+        </section>
+
+        <!-- NEW: Quick Tools Modal -->
+        <div id="quickToolsModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeQuickTools()">&times;</span>
+                <h3>🛠️ Quick Tools</h3>
+                <div class="tools-grid">
+                    <div class="tool-card" onclick="showEMICalculator()">
+                        <h4>EMI Calculator</h4>
+                        <p>Calculate loan payments</p>
+                    </div>
+                    <div class="tool-card" onclick="showCurrencyConverter()">
+                        <h4>Currency Converter</h4>
+                        <p>Live exchange rates</p>
+                    </div>
+                    <div class="tool-card" onclick="showDebtPlanner()">
+                        <h4>Debt Payoff</h4>
+                        <p>Optimal repayment plan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW: Transaction Modal -->
+        <div id="transactionModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeTransactionModal()">&times;</span>
+                <h3 id="transactionModalTitle">New Transaction</h3>
+                <div class="modal-form">
+                    <input type="date" id="transactionDate">
+                    <select id="transactionCategory"></select>
+                    <input type="number" id="transactionAmount" placeholder="Amount">
+                    <select id="transactionType">
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
+                    </select>
+                    <input type="text" id="transactionNotes" placeholder="Notes (optional)">
+                    <div class="modal-buttons">
+                        <button onclick="saveTransaction()">Save</button>
+                        <button onclick="closeTransactionModal()" class="secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="js/script.js"></script>
 </body>
-
 </html>
