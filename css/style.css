@@ -469,6 +469,77 @@ body.dark .theme-toggle {
     background: linear-gradient(140deg, #2563eb, #1d4ed8);
 }
 
+/* === NEW STYLES ONLY (APPEND TO EXISTING CSS) === */
+
+/* Transaction History */
+.transactions { margin: 40px 0; }
+.section-header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    margin-bottom: 20px; flex-wrap: wrap; gap: 10px; 
+}
+.section-header h2 { margin: 0; }
+.transaction-controls { 
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center; 
+}
+.table-container { 
+    background: var(--glass-bg); border-radius: 18px; 
+    border: 1px solid var(--glass-border); overflow: hidden; 
+    box-shadow: var(--glass-shadow); 
+}
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid rgba(148,163,184,0.12); }
+th { background: rgba(79,124,255,0.15); font-weight: 600; color: var(--accent); }
+tbody tr:hover { background: rgba(255,255,255,0.08); }
+.table-footer { 
+    display: flex; justify-content: space-between; align-items: center; 
+    margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--glass-border); 
+}
+
+/* Net Worth */
+.net-worth-section { margin: 40px 0; }
+.networth-inputs { 
+    display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; margin-bottom: 20px; 
+}
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+.input-group label { font-size: 0.9rem; font-weight: 500; }
+
+/* Goals */
+.goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.goal-card { 
+    padding: 20px; border-radius: 16px; background: var(--glass-bg); 
+    border: 1px solid var(--glass-border); position: relative; overflow: hidden; 
+}
+.goal-progress { height: 8px; border-radius: 4px; background: rgba(148,163,184,0.3); overflow: hidden; margin: 12px 0; }
+.goal-progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--success), var(--accent)); transition: width 0.5s ease; }
+.goal-timeline { font-size: 0.85rem; color: var(--text-muted); }
+
+/* Modals */
+.modal { 
+    display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
+    width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); 
+}
+.modal-content { 
+    background: var(--glass-bg); margin: 5% auto; padding: 0; border-radius: 20px; 
+    border: 1px solid var(--glass-border); width: 90%; max-width: 500px; 
+    max-height: 80vh; overflow-y: auto; box-shadow: var(--glass-shadow); 
+}
+.close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; padding: 12px 16px; color: var(--text-muted); }
+.close:hover { color: var(--text-main); }
+.modal-form { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+
+/* Tools */
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; padding: 20px; }
+.tool-card { 
+    padding: 20px; border-radius: 14px; background: rgba(255,255,255,0.1); 
+    cursor: pointer; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.2); 
+}
+.tool-card:hover { transform: translateY(-2px); background: rgba(255,255,255,0.2); box-shadow: var(--glass-shadow); }
+
+/* Dark mode adjustments for new elements */
+body.dark .goal-card, body.dark .tool-card, body.dark table th { background: rgba(255,255,255,0.08); }
+body.dark .modal-content { background: rgba(15,23,42,0.9); }
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -533,3 +604,14 @@ body.dark .theme-toggle {
         gap: 8px;
     }
 }
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .transaction-controls, .networth-inputs, .modal-buttons, .tools-grid, .table-footer { flex-direction: column; gap: 12px; }
+    .section-header { flex-direction: column; align-items: stretch; text-align: center; }
+    .table-container { overflow-x: auto; }
+}
+
+
+
