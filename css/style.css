@@ -540,6 +540,84 @@ tbody tr:hover { background: rgba(255,255,255,0.08); }
 body.dark .goal-card, body.dark .tool-card, body.dark table th { background: rgba(255,255,255,0.08); }
 body.dark .modal-content { background: rgba(15,23,42,0.9); }
 
+/* === SPA LAYOUT & SIDEBAR === */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background: var(--glass-bg);
+    border-right: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 40;
+}
+
+.sidebar-header {
+    padding: 30px 24px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.sidebar-header h2 {
+    font-size: 1.5rem;
+    color: var(--accent);
+    font-weight: 800;
+}
+
+.sidebar-nav {
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-link {
+    background: transparent;
+    color: var(--text-main);
+    text-align: left;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: none;
+}
+
+.nav-link:hover {
+    background: rgba(79, 124, 255, 0.1);
+    transform: translateX(4px);
+    box-shadow: none;
+}
+
+.nav-link.active {
+    background: linear-gradient(140deg, #1d4ed8, #3730a3);
+    color: white;
+    box-shadow: 0 4px 14px rgba(49, 58, 126, 0.3);
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 260px; /* Offset for fixed sidebar */
+    padding: 30px 40px;
+    max-width: calc(100vw - 260px);
+}
+
+/* === VIEW ROUTING === */
+.view {
+    display: none; /* Hide all views by default */
+    animation: fadeInUp 0.4s ease both;
+}
+
+.view.active {
+    display: block; /* Show active view */
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -613,5 +691,11 @@ body.dark .modal-content { background: rgba(15,23,42,0.9); }
     .table-container { overflow-x: auto; }
 }
 
-
-
+/* Responsive Sidebar */
+@media (max-width: 1024px) {
+    .app-container { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--glass-border); }
+    .main-content { margin-left: 0; max-width: 100%; padding: 20px; }
+    .sidebar-nav { flex-direction: row; overflow-x: auto; white-space: nowrap; padding: 10px; }
+    .nav-link { text-align: center; }
+}
