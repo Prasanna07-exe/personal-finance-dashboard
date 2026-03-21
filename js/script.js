@@ -1,3 +1,24 @@
+// === FLOATING INSIGHT BUTTON & MODAL ===
+document.addEventListener('DOMContentLoaded', function () {
+    const floatingBtn = document.getElementById('floatingInsightBtn');
+    const modal = document.getElementById('floatingInsightModal');
+    const closeBtn = document.getElementById('closeInsightModal');
+    if (floatingBtn && modal && closeBtn) {
+        floatingBtn.addEventListener('click', function () {
+            modal.classList.add('active');
+        });
+        closeBtn.addEventListener('click', function () {
+            modal.classList.remove('active');
+        });
+        // Optional: Close modal when clicking outside content
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+    }
+    // Hide the original insight section if present
+    var insightSection = document.querySelector('.insights.insight-section');
+    if (insightSection) insightSection.style.display = 'none';
+});
 const STORAGE_KEY = 'personal_finance_dashboard_state';
 const SAVINGS_GOAL_RATIO = 30;
 
@@ -335,7 +356,9 @@ function initializeCharts() {
     if (ctxSummary) {
         summaryChart = new Chart(ctxSummary, {
             type: 'bar',
-            data: { labels: ['Income', 'Expenses', 'Savings'], datasets: [{ data: [0,0,0], backgroundColor: ['#2ecc71', '#e74c3c', '#3498db'], borderRadius: 6 }] },
+            data: { labels: ['Income', 'Expenses', 'Savings'], datasets: [{ data: [0,0,0], backgroundColor: ['#2ecc71', '#e74c3c', '#3498db'],borderRadius: 6,
+    barPercentage: 0.4,
+    categoryPercentage: 0.5 }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
     }
@@ -345,7 +368,24 @@ function initializeCharts() {
         expenseChart = new Chart(ctxExpense, {
             type: 'pie',
             data: { labels: [], datasets: [{ data: [], backgroundColor: ['#f1c40f', '#e67e22', '#1abc9c', '#9b59b6', '#e74c3c', '#34495e', '#8e44ad'] }] },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const data = context.chart.data.datasets[0].data;
+                                const total = data.reduce((a, b) => a + b, 0);
+                                const percent = total ? ((value / total) * 100).toFixed(1) : 0;
+                                return `${label}: ₹${value.toLocaleString()} (${percent}%)`;
+                            }
+                        }
+                    }
+                }
+            }
         });
     }
 

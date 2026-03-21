@@ -94,9 +94,21 @@
                 </section>
 
                 <section class="insights insight-section">
-                    <h2>AI Financial Insight</h2>
-                    <p id="insightText">Add income and expenses to get insights.</p>
+                    <!-- Floating Insight Button and Modal will be added below -->
                 </section>
+
+                <!-- Floating AI Insight Button -->
+                <button id="floatingInsightBtn" title="Show AI Financial Insight">
+                    💡
+                </button>
+                <!-- Floating AI Insight Modal -->
+                <div id="floatingInsightModal" class="floating-insight-modal">
+                    <div class="floating-insight-content">
+                        <span id="closeInsightModal" class="close-insight">&times;</span>
+                        <h2>AI Financial Insight</h2>
+                        <p id="insightText">Add income and expenses to get insights.</p>
+                    </div>
+                </div>
             </div>
 
             <div id="transactions-view" class="view">
@@ -172,10 +184,6 @@
                     </div>
                 </section>
 
-                <section class="insights breakdown-section">
-                    <h2>Expense Percentage Breakdown</h2>
-                    <div id="expenseBreakdown"></div>
-                </section>
             </div>
 
             <div id="wealth-view" class="view">

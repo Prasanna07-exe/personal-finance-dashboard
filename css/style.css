@@ -1,3 +1,77 @@
+/* Floating AI Insight Button */
+#floatingInsightBtn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 1001;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f7cff, #3b82f6);
+    color: #fff;
+    font-size: 2rem;
+    box-shadow: 0 6px 24px rgba(79, 124, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+#floatingInsightBtn:hover {
+    background: linear-gradient(135deg, #3b82f6, #4f7cff);
+    box-shadow: 0 12px 32px rgba(79, 124, 255, 0.28);
+    transform: scale(1.08);
+}
+
+/* Floating AI Insight Modal */
+.floating-insight-modal {
+    display: none;
+    position: fixed;
+    z-index: 1100;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(30, 41, 59, 0.18);
+    backdrop-filter: blur(2px);
+    align-items: center;
+    justify-content: center;
+}
+.floating-insight-modal.active {
+    display: flex;
+}
+.floating-insight-content {
+    background: var(--glass-bg);
+    border-radius: 18px;
+    box-shadow: 0 10px 32px rgba(30, 41, 59, 0.18);
+    padding: 32px 28px 24px 28px;
+    min-width: 320px;
+    max-width: 90vw;
+    position: relative;
+    animation: fadeInUp 0.4s;
+}
+.floating-insight-content h2 {
+    margin-bottom: 12px;
+    font-size: 1.18rem;
+}
+.floating-insight-content p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+.close-insight {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 1.6rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.close-insight:hover {
+    color: #ef4444;
+}
 :root {
     --text-main: #0f172a;
     --text-muted: #5d687c;
@@ -19,6 +93,8 @@
 
 body {
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
     color: var(--text-main);
     background:
         radial-gradient(circle at 8% 18%, rgba(99, 102, 241, 0.30) 0%, transparent 33%),
