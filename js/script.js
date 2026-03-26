@@ -45,6 +45,13 @@ let state = getDefaultState();
 // === CHART GLOBALS ===
 let expenseChart, summaryChart, forecastChart, budgetChart, networthChart;
 
+// === INLINE ERROR HELPERS ===
+function setInlineError(elementId, message) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.textContent = message || '';
+}
+
 // === INITIALIZATION & ROUTER ===
 function initializeApp() {
     populateDropdowns();
@@ -211,20 +218,38 @@ function addTransaction(type = 'expense', amount = 0, category = 'Others', date 
 
 function addIncome() {
     const input = document.getElementById('incomeInput');
-    if (!input || !input.value) return;
-    addTransaction('income', input.value, 'Salary', new Date().toISOString().split('T')[0], 'Direct Entry');
+    if (!input) return;
+    const value = Number(input.value);
+    if (!input.value || isNaN(value) || value <= 0) {
+        setInlineError('incomeError', 'Please enter a positive income amount.');
+        return;
+    }
+    setInlineError('incomeError', '');
+    addTransaction('income', value, 'Salary', new Date().toISOString().split('T')[0], 'Direct Entry');
     input.value = '';
 }
 
 function addExpense() {
     const categoryEl = document.getElementById('category');
     const input = document.getElementById('expenseInput');
-    if (!input || !input.value || !categoryEl) return;
-    addTransaction('expense', input.value, categoryEl.value, new Date().toISOString().split('T')[0], 'Direct Entry');
+    if (!input || !categoryEl) return;
+    const value = Number(input.value);
+    if (!input.value || isNaN(value) || value <= 0) {
+        setInlineError('expenseError', 'Please enter a positive expense amount.');
+        return;
+    }
+    setInlineError('expenseError', '');
+    addTransaction('expense', value, categoryEl.value, new Date().toISOString().split('T')[0], 'Direct Entry');
     input.value = '';
 }
 
 function deleteTransaction(id) {
+    const txn = state.transactions.find(t => t.id === id.toString());
+    let message = 'Delete this transaction?';
+    if (txn) {
+        message = `Delete transaction of ₹${txn.amount.toLocaleString()} in ${txn.category} on ${new Date(txn.date).toLocaleDateString('en-IN')}?`;
+    }
+    if (!confirm(message)) return;
     state.transactions = state.transactions.filter(t => t.id !== id.toString());
     saveState();
     renderAll();
@@ -269,7 +294,15 @@ function renderTransactions() {
 function setBudget() {
     const input = document.getElementById('budgetInput');
     if (!input) return;
-    state.budget = Number(input.value) || 0;
+    const value = Number(input.value);
+    if (!input.value || isNaN(value) || value <= 0) {
+        state.budget = 0;
+        setInlineError('budgetWarning', 'Enter a positive monthly limit to enable budget tracking.');
+        saveState();
+        renderAll();
+        return;
+    }
+    state.budget = value;
     saveState();
     renderAll();
 }
@@ -457,8 +490,20 @@ function updateNetWorthChart() {
 
 // === NET WORTH CALCULATOR ===
 function calculateNetWorth() {
-    const assets = Number(document.getElementById('assetsInput')?.value || 0);
-    const liabilities = Number(document.getElementById('liabilitiesInput')?.value || 0);
+    const assetsInput = document.getElementById('assetsInput');
+    const liabilitiesInput = document.getElementById('liabilitiesInput');
+    const assets = Number(assetsInput?.value || 0);
+    const liabilities = Number(liabilitiesInput?.value || 0);
+
+    if ((!assetsInput || !assetsInput.value) && (!liabilitiesInput || !liabilitiesInput.value)) {
+        setInlineError('networthError', 'Enter at least one value for assets or liabilities.');
+        return;
+    }
+    if (isNaN(assets) || assets < 0 || isNaN(liabilities) || liabilities < 0) {
+        setInlineError('networthError', 'Values must be zero or positive numbers.');
+        return;
+    }
+    setInlineError('networthError', '');
     const netWorth = assets - liabilities;
     
     const valEl = document.getElementById('netWorthValue');
@@ -741,12 +786,22 @@ function showSubscriptionModal() {
     const dueDate = prompt("Day of the month it renews (1-31):");
     
     if (name && amount && dueDate) {
+        const amt = Number(amount);
+        const day = Number(dueDate);
+        if (isNaN(amt) || amt <= 0) {
+            alert('Monthly cost must be a positive number.');
+            return;
+        }
+        if (isNaN(day) || day < 1 || day > 31) {
+            alert('Renewal day must be between 1 and 31.');
+            return;
+        }
         state.subscriptions = state.subscriptions || [];
         state.subscriptions.push({
             id: Date.now().toString(),
             name,
-            amount: Number(amount),
-            dueDate: Number(dueDate)
+            amount: amt,
+            dueDate: day
         });
         saveState();
         renderSubscriptions();
@@ -873,6 +928,16 @@ function closeQuickTools() {
     if (modal) modal.style.display = 'none';
 }
 
+function showUserManual() {
+    const modal = document.getElementById('userManualModal');
+    if (modal) modal.style.display = 'block';
+}
+
+function closeUserManual() {
+    const modal = document.getElementById('userManualModal');
+    if (modal) modal.style.display = 'none';
+}
+
 function showEMICalculator() {
     closeQuickTools();
     const principal = prompt("Enter Loan Amount (₹):", "100000");
@@ -883,6 +948,10 @@ function showEMICalculator() {
         const p = Number(principal);
         const r = Number(rate) / 12 / 100;
         const n = Number(tenure);
+        if (isNaN(p) || isNaN(r) || isNaN(n) || p <= 0 || r <= 0 || n <= 0) {
+            alert('Please enter valid positive numbers for amount, rate, and tenure.');
+            return;
+        }
         const emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
         alert(`Calculated EMI: ₹${emi.toFixed(2)} per month\nTotal Amount Payable: ₹${(emi * n).toFixed(2)}`);
     }
@@ -1101,7 +1170,10 @@ function applyTheme() {
 }
 
 function resetDashboard() {
-    if (!confirm('Reset all income, expenses, budget, and insights?')) return;
+    const txnCount = state.transactions.length;
+    const goalsCount = state.goals.length;
+    const message = `This will clear ${txnCount} transactions, ${goalsCount} goals, budgets, insights, and local settings on this device. Continue?`;
+    if (!confirm(message)) return;
     state = getDefaultState();
     state.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
     saveState();
@@ -1109,9 +1181,14 @@ function resetDashboard() {
 }
 
 function monthlyReset() {
-    if (!confirm('Clear all transactions older than 30 days?')) return;
     const monthAgo = new Date();
     monthAgo.setMonth(monthAgo.getMonth() - 1);
+    const removable = state.transactions.filter(t => new Date(t.date) <= monthAgo);
+    if (removable.length === 0) {
+        alert('No transactions older than 30 days to clear.');
+        return;
+    }
+    if (!confirm(`Clear ${removable.length} transaction(s) older than 30 days?`)) return;
     state.transactions = state.transactions.filter(t => new Date(t.date) > monthAgo);
     state.lastReset = new Date().toISOString();
     saveState();
@@ -1161,4 +1238,113 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (searchInput) searchInput.addEventListener('input', renderTransactions);
     if (filterSelect) filterSelect.addEventListener('change', renderTransactions);
+
+    init3DInteractions();
+    initHeaderOnScroll();
+    initButtonRipples();
+    initCardShortcuts();
 });
+
+// === 3D INTERACTIONS (SUBTLE TILT) ===
+function init3DInteractions() {
+    const interactiveCards = document.querySelectorAll('.card, .chart-box, .analytics-card');
+    const maxTilt = 10; // degrees
+
+    interactiveCards.forEach(card => {
+        if (card.dataset.tiltBound === 'true') return;
+        card.dataset.tiltBound = 'true';
+
+        card.addEventListener('pointermove', (event) => {
+            const rect = card.getBoundingClientRect();
+            const x = (event.clientX - rect.left) / rect.width - 0.5;   // -0.5 to 0.5
+            const y = (event.clientY - rect.top) / rect.height - 0.5;   // -0.5 to 0.5
+
+            const tiltX = (-y * maxTilt).toFixed(2);
+            const tiltY = (x * maxTilt).toFixed(2);
+
+            card.style.setProperty('--tiltX', tiltX + 'deg');
+            card.style.setProperty('--tiltY', tiltY + 'deg');
+        });
+
+        card.addEventListener('pointerleave', () => {
+            card.style.setProperty('--tiltX', '0deg');
+            card.style.setProperty('--tiltY', '0deg');
+        });
+    });
+}
+
+// === STICKY HEADER BEHAVIOR ===
+function initHeaderOnScroll() {
+    const header = document.querySelector('.top-header');
+    if (!header) return;
+    let isCompact = false;
+
+    const onScroll = () => {
+        const y = window.scrollY || window.pageYOffset || 0;
+        // Hysteresis: expand only near top, compact only after a bit of scrolling
+        if (!isCompact && y > 80) {
+            header.classList.add('compact');
+            isCompact = true;
+        } else if (isCompact && y < 40) {
+            header.classList.remove('compact');
+            isCompact = false;
+        }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+}
+
+// === BUTTON RIPPLE EFFECT ===
+function initButtonRipples() {
+    document.addEventListener('pointerdown', (event) => {
+        const button = event.target.closest('button');
+        if (!button) return;
+
+        const rect = button.getBoundingClientRect();
+        const circle = document.createElement('span');
+        const size = Math.max(rect.width, rect.height);
+
+        circle.className = 'ripple-circle';
+        circle.style.width = circle.style.height = size + 'px';
+        circle.style.left = (event.clientX - rect.left) + 'px';
+        circle.style.top = (event.clientY - rect.top) + 'px';
+
+        button.appendChild(circle);
+
+        circle.addEventListener('animationend', () => {
+            circle.remove();
+        });
+    });
+}
+
+// === DASHBOARD CARD SHORTCUTS ===
+function initCardShortcuts() {
+    const incomeCard = document.querySelector('.card.income');
+    const expenseCard = document.querySelector('.card.expense');
+    const savingsCard = document.querySelector('.card.savings');
+
+    if (incomeCard) {
+        incomeCard.addEventListener('click', () => {
+            switchView('budget-view');
+        });
+    }
+
+    if (expenseCard) {
+        expenseCard.addEventListener('click', () => {
+            switchView('transactions-view');
+        });
+    }
+
+    if (savingsCard) {
+        savingsCard.addEventListener('click', () => {
+            switchView('wealth-view');
+            setTimeout(() => {
+                const goalsSection = document.querySelector('.goals-manager');
+                if (goalsSection) {
+                    goalsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 220);
+        });
+    }
+}

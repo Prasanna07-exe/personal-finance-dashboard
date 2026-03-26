@@ -22,7 +22,7 @@
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>FinancePro</h2>
+                <h2 onclick="switchView('overview')">FinancePro</h2>
             </div>
             <nav class="sidebar-nav">
                 <button class="nav-link active" onclick="switchView('overview')">Overview</button>
@@ -45,6 +45,7 @@
                     <button onclick="downloadReport()">Download Report</button>
                     <button onclick="resetDashboard()">Reset</button>
                     <button onclick="showQuickTools()" title="EMI, Currency, Goals">Tools</button>
+                    <button onclick="showUserManual()" title="How to use this dashboard">Help</button>
                 </div>
             </header>
 
@@ -68,12 +69,14 @@
                     <div class="input-box">
                         <h3>Add Income</h3>
                         <input type="number" id="incomeInput" placeholder="Enter monthly income">
+                        <p id="incomeError" class="input-error"></p>
                         <button onclick="addIncome()">Add Income</button>
                     </div>
                     <div class="input-box">
                         <h3>Add Expense</h3>
                         <select id="category"></select>
                         <input type="number" id="expenseInput" placeholder="Enter expense amount">
+                        <p id="expenseError" class="input-error"></p>
                         <button onclick="addExpense()">Add Expense</button>
                     </div>
                     <div class="input-box">
@@ -187,7 +190,7 @@
             </div>
 
             <div id="wealth-view" class="view">
-                <section class="net-worth-section" style="margin-top: 0;">
+                <section class="net-worth-section">
                     <h2>Net Worth Tracker</h2>
                     <div class="networth-inputs">
                         <div class="input-group">
@@ -200,6 +203,7 @@
                         </div>
                         <button onclick="calculateNetWorth()" style="align-self: flex-end; margin-bottom: 12px;">Calculate</button>
                     </div>
+                    <p id="networthError" class="input-error"></p>
                     <div class="card networth" id="networthCard" style="display: none; margin-bottom: 20px;">
                         <h3>Current Net Worth</h3>
                         <p id="netWorthValue">₹0</p>
@@ -209,7 +213,7 @@
                     </div>
                 </section>
 
-                <section class="goals-manager" style="margin-top: 40px;">
+                <section class="goals-manager">
                     <div class="section-header">
                         <h2>Savings Goals</h2>
                         <button onclick="showGoalModal()">➕ Add Goal</button>
@@ -296,6 +300,24 @@
                     <button onclick="saveTransaction()">Save</button>
                     <button onclick="closeTransactionModal()" class="secondary" style="background:transparent; border:1px solid #ccc; color:inherit;">Cancel</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userManualModal" class="modal">
+        <div class="modal-content" style="max-width: 720px;">
+            <span class="close" onclick="closeUserManual()">&times;</span>
+            <h3>FinancePro User Guide</h3>
+            <div class="modal-form" style="gap: 10px;">
+                <p><strong>Overview</strong> – See total Income, Expenses, and Savings. Use the cards to jump into detailed views (click Income for Budget & Insights, Expenses for Transactions, Savings for Net Worth & Goals).</p>
+                <p><strong>Transactions</strong> – Log every income and expense, search or filter by category, and export/import CSV for backups.</p>
+                <p><strong>Budget & Insights</strong> – Track expense distribution, compare Budget vs Actual, and view a basic cashflow forecast plus your Financial Health Score.</p>
+                <p><strong>Net Worth & Goals</strong> – Enter Assets and Liabilities to calculate Net Worth and see its trend. Create savings goals, then add contributions from your available savings.</p>
+                <p><strong>Investments</strong> – Add assets with quantity and prices. The dashboard shows total invested, current value, and P&L. Selling logs income automatically.</p>
+                <p><strong>Subscriptions</strong> – Track fixed monthly costs (rent, OTT, gym, etc.) and see your total monthly burn rate.</p>
+                <p><strong>Quick Tools</strong> – Use the Tools button for EMI calculation, currency conversion, and a quick debt payoff tip.</p>
+                <p><strong>Theme & Reports</strong> – Toggle light/dark mode from the header. Use Download Report to generate a PDF summary of your finances.</p>
+                <p><strong>Tips</strong> – Start by adding income, then 3–5 expenses, set a monthly budget, and finally add at least one savings goal to unlock the most insights.</p>
             </div>
         </div>
     </div>
