@@ -2,7 +2,7 @@
 .top-header {
     position: sticky;
     top: 14px;
-    z-index: 30;
+    z-index: 999;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -432,7 +432,7 @@ select:focus {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 999999 !important;
     inset: 0;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
@@ -595,6 +595,112 @@ body.dark .top-header button:hover {
     transform: translateY(-2px);
 }
 
+/* ==============================================================
+   AI INSIGHT EASTER EGG (FLOATING BUTTON & MODAL)
+   ============================================================== */
+
+/* The Floating Bulb Button */
+#floatingInsightBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    color: white;
+    font-size: 1.4rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    z-index: 9999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    animation: eggPulse 3s infinite ease-in-out;
+}
+
+#floatingInsightBtn:hover {
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 12px 28px rgba(59, 130, 246, 0.6);
+    animation-play-state: paused;
+}
+
+/* The Popup Modal */
+.floating-insight-modal {
+    position: fixed;
+    bottom: 95px;
+    /* Sits right above the button */
+    right: 30px;
+    width: 320px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    padding: 22px;
+    z-index: 9998;
+
+    /* Hidden state */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.95);
+    transform-origin: bottom right;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Active/Visible State (Triggered by JS) */
+.floating-insight-modal.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.floating-insight-content {
+    position: relative;
+}
+
+.floating-insight-content h2 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #3b82f6;
+    /* Accent color */
+}
+
+.floating-insight-content p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-main);
+}
+
+/* Close 'X' Button */
+.close-insight {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.close-insight:hover {
+    color: var(--danger);
+}
+
+/* Dark Mode Override for the Modal */
+body.dark .floating-insight-modal {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: #333;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+body.dark .floating-insight-content p {
+    color: #f8fafc;
+}
+
 /* Media Queries */
 @media (max-width: 1024px) {
 
@@ -667,4 +773,295 @@ body.dark .top-header button:hover {
         width: 100%;
         justify-content: flex-start;
     }
+}
+
+/* ==============================================================
+   MOBILE HAMBURGER MENU & 3D RESPONSIVE FIXES
+   ============================================================== */
+
+/* Hidden by default on Desktop */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 5px !important;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.hamburger-btn .bar {
+    width: 26px;
+    height: 3px;
+    background-color: var(--text-main);
+    border-radius: 3px;
+    transition: all 0.3s ease-in-out;
+}
+
+body.dark .hamburger-btn .bar {
+    background-color: #ffffff;
+}
+
+.mobile-only-nav {
+    display: none;
+}
+
+/* --- MOBILE STYLES (768px and below) --- */
+@media (max-width: 768px) {
+
+    /* =======================================
+       1. HEADER (Hamburger to the Right)
+       ======================================= */
+    .top-header {
+        flex-direction: row !important;
+        /* Forces side-by-side layout */
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 12px 18px !important;
+
+        /* Stop the header from trapping the side drawer */
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        transform: none !important;
+        animation: none !important;
+        background: var(--glass-bg) !important;
+    }
+
+    body.dark .top-header {
+        background: #000000 !important;
+    }
+
+    .hamburger-btn {
+        display: flex;
+    }
+
+    #viewSubtitle {
+        display: none;
+    }
+
+    /* =======================================
+       2. REVERSED DRAWER (Slides from Left)
+       ======================================= */
+    .toggle-section {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        /* Start off-screen to the LEFT */
+        right: auto;
+        width: 280px;
+        height: 100vh;
+        background: var(--glass-bg);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-right: 1px solid var(--glass-border);
+        /* Border moved to right */
+        border-left: none !important;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        padding: 85px 24px 24px;
+        gap: 12px;
+        transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* Animate Left */
+        z-index: 99999 !important;
+        /* Boosted to stay above 3D scene */
+        box-shadow: 10px 0 40px rgba(0, 0, 0, 0.15);
+        /* Shadow falls to the right */
+    }
+
+    /* Open State for the Drawer */
+    .toggle-section.open {
+        left: 0;
+    }
+
+    body.dark .toggle-section {
+        background: rgba(10, 10, 10, 0.95) !important;
+        border-right: 1px solid #262626 !important;
+        border-left: none !important;
+    }
+
+    /* Morphing Hamburger into an 'X' */
+    .hamburger-btn.open .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+
+    .hamburger-btn.open .bar:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger-btn.open .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+
+    /* Fallback Mobile Navigation Styling */
+    .mobile-only-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+        border-top: 1px solid rgba(148, 163, 184, 0.3);
+        padding-top: 15px;
+    }
+
+    .nav-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .mobile-only-nav .nav-btn {
+        background: rgba(255, 255, 255, 0.4) !important;
+        color: var(--text-main) !important;
+        text-align: left;
+        padding: 12px 16px;
+        border: 1px solid var(--glass-border) !important;
+        font-weight: 600;
+    }
+
+    body.dark .mobile-only-nav {
+        border-top-color: #333;
+    }
+
+    body.dark .mobile-only-nav .nav-btn {
+        background: #111 !important;
+        color: #fff !important;
+        border-color: #333 !important;
+    }
+
+    /* =======================================
+       3. NATIVE APP LAYOUT: HERO + GRID
+       ======================================= */
+
+    /* Turn the 3D container into a responsive Grid */
+    .hero-3d-container {
+        padding-bottom: 90px !important; 
+        gap: 14px !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        /* 2 clean columns */
+        gap: 12px;
+        height: auto !important;
+        /* Let it expand naturally */
+        min-height: unset !important;
+        padding-bottom: 30px;
+        background: transparent !important;
+        border-radius: 0 !important;
+    }
+
+    /* Make the Spline scene a "Hero" graphic spanning the top */
+    #spline-wrapper {
+        grid-column: 1 / -1;
+        /* Stretch across both columns */
+        position: relative !important;
+        top: 0 !important;
+        height: 35vh !important;
+        /* Locks the 3D size */
+        min-height: 280px;
+        z-index: 1 !important;
+        margin-bottom: 30px;
+    }
+
+    /* Transform the floating nodes into standard app buttons */
+    .node-orbit {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        /* Stop orbital positioning */
+        animation: none !important;
+        /* Stop floating animation */
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 16px 12px !important;
+        justify-content: center;
+        text-align: center;
+        border-radius: 14px !important;
+        font-size: 0.85rem !important;
+        background: var(--glass-bg) !important;
+        border: 1px solid var(--glass-border) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+        white-space: normal;
+    }
+
+    /* Add a subtle 'tap' effect for mobile users */
+    .node-orbit:active {
+        transform: scale(0.96) !important;
+        background: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    body.dark .node-orbit {
+        background: #111 !important;
+        border-color: #333 !important;
+    }
+
+    /* Erase the old positioning classes */
+    .pos-1,
+    .pos-2,
+    .pos-3,
+    .pos-4,
+    .pos-5,
+    .pos-6,
+    .pos-7,
+    .pos-8 {
+        top: auto;
+        left: auto;
+    }
+    .mobile-quick-add {
+        grid-column: 1 / -1; /* Forces it to span across both columns */
+        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%) !important; /* Premium Success Green */
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 16px !important;
+        padding: 18px !important;
+        font-size: 1.05rem !important;
+        font-weight: bold !important;
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25) !important;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .mobile-quick-add:active {
+        transform: scale(0.97) !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+    }
+}
+
+/* ==============================================================
+   MOBILE MENU OVERLAY (FROSTED BACKDROP)
+   ============================================================== */
+
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+    /* shorthand for top:0, right:0, bottom:0, left:0 */
+    background: rgba(15, 23, 42, 0.3);
+    /* Subtle dark tint */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 999;
+    /* Sits directly below the drawer (which is 1000) */
+
+    /* Hidden state */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Active State */
+.menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Dark Mode Adjustment */
+body.dark .menu-overlay {
+    background: rgba(0, 0, 0, 0.6);
 }
