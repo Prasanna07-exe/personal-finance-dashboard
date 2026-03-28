@@ -1,54 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Decision Dashboard</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>FinancePro | Interactive Wealth Hub</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/views.css">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="manifest" href="data:application/manifest+json,{
-        'name': 'Personal Finance Dashboard',
-        'short_name': 'FinancePro',
-        'start_url': '.',
-        'display': 'standalone',
-        'background_color': '#edf2ff',
-        'theme_color': '#4f7cff'
-    }">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.73/build/spline-viewer.js"></script>
 </head>
 
-<body>
+<body class="dark">
     <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>FinancePro</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <button class="nav-link active" onclick="switchView('overview')">Overview</button>
-                <button class="nav-link" onclick="switchView('transactions-view')">Transactions</button>
-                <button class="nav-link" onclick="switchView('budget-view')">Budget & Insights</button>
-                <button class="nav-link" onclick="switchView('wealth-view')">Net Worth & Goals</button>
-                <button class="nav-link" onclick="switchView('investments-view')">Investments</button>
-                <button class="nav-link" onclick="switchView('subscriptions-view')">Subscriptions</button>
-            </nav>
-        </aside>
-
         <main class="main-content">
-            <header class="top-header">
-                <div class="title-section">
-                    <h1 id="viewTitle">Dashboard Overview</h1>
-                    <p>Startup-grade money intelligence for smarter decisions</p>
+            <header class="top-header" style="z-index: 100;">
+                <div class="title-section" style="display: flex; align-items: center; gap: 16px;">
+                    <button id="backToHubBtn" onclick="switchView('home-hub')"
+                        style="display: none; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+                        ⭠ Back to Hub
+                    </button>
+                    <div>
+                        <h1 id="viewTitle">FinancePro</h1>
+                        <p>Startup-grade money intelligence</p>
+                    </div>
                 </div>
                 <div class="toggle-section">
-                    <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
-                    <button onclick="downloadReport()">Download Report</button>
-                    <button onclick="resetDashboard()">Reset</button>
-                    <button onclick="showQuickTools()" title="EMI, Currency, Goals">Tools</button>
+                    <button class="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
+                    <button onclick="downloadReport()">Get Report</button>
+                    <button onclick="showQuickTools()">Tools</button>
+                    <button onclick="showUserManual()">Help</button>
                 </div>
             </header>
 
-            <div id="overview" class="view active">
+            <div id="home-hub" class="view active">
+                <div class="hero-3d-container">
+                    <div id="spline-wrapper" style="position: absolute; width: 100%; height: 100%; z-index: 1;">
+                        <spline-viewer
+                            url="https://prod.spline.design/vnLh5ZNRjBQEz9V4/scene.splinecode"></spline-viewer>
+                    </div>
+
+                    <div class="node-orbit pos-1" onclick="switchView('overview')">
+                        <span>Dashboard Stats</span>
+                    </div>
+                    <div class="node-orbit pos-2" onclick="switchView('transactions-view')">
+                        <span>Transactions</span>
+                    </div>
+                    <div class="node-orbit pos-3" onclick="switchView('budget-view')">
+                        <span>Budget Insights</span>
+                    </div>
+                    <div class="node-orbit pos-4" onclick="switchView('wealth-view')">
+                        <span>Net Worth</span>
+                    </div>
+                    <div class="node-orbit pos-5" onclick="switchView('goals-view')">
+                        <span>Savings Goals</span>
+                    </div>
+                    <div class="node-orbit pos-6" onclick="switchView('investments-view')">
+                        <span>Investments</span>
+                    </div>
+                    <div class="node-orbit pos-7" onclick="switchView('subscriptions-view')">
+                        <span>Subscriptions</span>
+                    </div>
+                    <div class="node-orbit pos-8" onclick="switchView('accounts-view')">
+                        <span>Bank Accounts</span>
+                    </div>
+                </div>
+            </div>
+            <div id="accounts-view" class="view">
+                <section class="accounts-manager">
+                    <div class="section-header">
+                        <h2>Linked Bank Accounts</h2>
+                        <div class="transaction-controls">
+                            <button onclick="showTransferModal()"
+                                style="background:transparent; border:1px solid var(--glass-border);">🔄 Transfer
+                                Funds</button>
+                            <button onclick="showAccountModal()">➕ Add Bank Account</button>
+                        </div>
+                    </div>
+                    <div class="analytics-card" style="margin-bottom: 24px; border-top: 2px solid #3b82f6 !important;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Total Liquid Balance</p>
+                        <h2 id="totalAccountsBalance" style="font-size: 2.5rem;">₹0</h2>
+                    </div>
+                    <div id="accountsGrid" class="goals-grid"></div>
+                </section>
+            </div>
+            <div id="overview" class="view">
                 <section class="cards">
                     <div class="card income">
                         <h3>Total Income</h3>
@@ -63,40 +103,52 @@
                         <p id="savingsValue">₹0</p>
                     </div>
                 </section>
-                
+
                 <section class="inputs">
                     <div class="input-box">
                         <h3>Add Income</h3>
-                        <input type="number" id="incomeInput" placeholder="Enter monthly income">
+                        <select class="account-dropdown" id="incomeAccount">
+                            <option value="">-- Select Bank Account --</option>
+                        </select>
+                        <input type="number" id="incomeInput" placeholder="e.g., 50000">
+                        <p id="incomeError" class="input-error"></p>
                         <button onclick="addIncome()">Add Income</button>
                     </div>
                     <div class="input-box">
                         <h3>Add Expense</h3>
                         <select id="category"></select>
-                        <input type="number" id="expenseInput" placeholder="Enter expense amount">
+                        <select class="account-dropdown" id="expenseAccount">
+                            <option value="">-- Select Bank Account --</option>
+                        </select>
+                        <input type="number" id="expenseInput" placeholder="e.g., 1500">
+                        <p id="expenseError" class="input-error"></p>
                         <button onclick="addExpense()">Add Expense</button>
                     </div>
                     <div class="input-box">
                         <h3>Monthly Budget</h3>
-                        <input type="number" id="budgetInput" placeholder="Set monthly expense limit">
+                        <input type="number" id="budgetInput" placeholder="e.g., 30000">
                         <button onclick="setBudget()">Set Budget</button>
-                        <p id="budgetWarning"></p>
+                        <p id="budgetWarning" class="input-error"></p>
                     </div>
                 </section>
 
                 <section class="charts" style="grid-template-columns: 1fr;">
                     <div class="chart-box">
                         <h3>Income vs Expense</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="summaryChart"></canvas>
-                        </div>
+                        <div class="chart-wrapper"><canvas id="summaryChart"></canvas></div>
                     </div>
                 </section>
 
-                <section class="insights insight-section">
-                    <h2>AI Financial Insight</h2>
-                    <p id="insightText">Add income and expenses to get insights.</p>
-                </section>
+                <section class="insights insight-section" style="display: none;"></section>
+
+                <button id="floatingInsightBtn" title="Show AI Financial Insight">💡</button>
+                <div id="floatingInsightModal" class="floating-insight-modal">
+                    <div class="floating-insight-content">
+                        <span id="closeInsightModal" class="close-insight">&times;</span>
+                        <h2>AI Financial Insight</h2>
+                        <p id="insightText">Add income and expenses to get insights.</p>
+                    </div>
+                </div>
             </div>
 
             <div id="transactions-view" class="view">
@@ -104,12 +156,13 @@
                     <div class="section-header">
                         <h2>Transaction History</h2>
                         <div class="transaction-controls">
-                            <input type="text" id="searchTransactions" placeholder="🔍 Search...">
+                            <input type="text" id="searchTransactions" placeholder="🔍 Search notes or category...">
                             <select id="filterCategory">
                                 <option value="">All Categories</option>
                             </select>
                             <button onclick="exportCSV()">📤 Export</button>
-                            <button onclick="importCSV()" class="secondary">📥 Import</button>
+                            <button onclick="importCSV()" class="secondary"
+                                style="background:transparent; border:1px solid var(--glass-border);">📥 Import</button>
                             <button onclick="showAddTransactionModal()">➕ New</button>
                         </div>
                     </div>
@@ -117,14 +170,19 @@
                         <table id="transactionsTable">
                             <thead>
                                 <tr>
-                                    <th>Date</th><th>Category</th><th>Amount</th><th>Type</th><th>Notes</th><th>Actions</th>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
                     </div>
                     <div class="table-footer">
-                        <button onclick="monthlyReset()">🔄 Monthly Reset</button>
+                        <button onclick="monthlyReset()">Clear > 30 Days</button>
                         <span id="transactionCount">0 transactions</span>
                     </div>
                 </section>
@@ -139,69 +197,154 @@
                                 <span id="healthScoreValue">0</span><small>/100</small>
                             </div>
                         </div>
-                        <p id="healthScoreLabel">Add transactions to generate your score.</p>
+                        <p id="healthScoreLabel" style="text-align: center; color: var(--text-muted);">Add transactions
+                            to generate your score.</p>
                     </div>
                     <div class="analytics-card goal-card">
                         <h3>Savings Goal Progress</h3>
-                        <p class="goal-caption">Target savings ratio: 30%</p>
-                        <div class="goal-track">
+                        <p class="goal-caption" style="color: var(--text-muted);">Target savings ratio: 30%</p>
+                        <div class="goal-track" style="margin: 15px 0;">
                             <div id="savingsGoalProgress" class="goal-fill"></div>
                         </div>
-                        <p id="savingsGoalText">Add income to track your goal progress.</p>
+                        <p id="savingsGoalText" style="text-align: center; color: var(--text-muted);">Add income to
+                            track your goal progress.</p>
                     </div>
                 </section>
 
                 <section class="charts">
                     <div class="chart-box">
                         <h3>Expense Distribution</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="expenseChart"></canvas>
-                        </div>
+                        <div class="chart-wrapper"><canvas id="expenseChart"></canvas></div>
                     </div>
                     <div class="chart-box">
                         <h3>Budget vs Actual</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="budgetChart"></canvas>
-                        </div>
+                        <div class="chart-wrapper"><canvas id="budgetChart"></canvas></div>
                     </div>
                     <div class="chart-box" style="grid-column: span 2;">
                         <h3>Cashflow Forecast</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="forecastChart"></canvas>
-                        </div>
+                        <div class="chart-wrapper"><canvas id="forecastChart"></canvas></div>
                     </div>
-                </section>
-
-                <section class="insights breakdown-section">
-                    <h2>Expense Percentage Breakdown</h2>
-                    <div id="expenseBreakdown"></div>
                 </section>
             </div>
 
             <div id="wealth-view" class="view">
-                <section class="net-worth-section" style="margin-top: 0;">
-                    <h2>Net Worth Tracker</h2>
-                    <div class="networth-inputs">
-                        <div class="input-group">
-                            <label>Total Assets</label>
-                            <input type="number" id="assetsInput" placeholder="Cash, property...">
-                        </div>
-                        <div class="input-group">
-                            <label>Total Liabilities</label>
-                            <input type="number" id="liabilitiesInput" placeholder="Loans, debt...">
-                        </div>
-                        <button onclick="calculateNetWorth()" style="align-self: flex-end; margin-bottom: 12px;">Calculate</button>
+                <section class="net-worth-section">
+                    <div class="section-header">
+                        <h2>Net Worth Tracker</h2>
                     </div>
-                    <div class="card networth" id="networthCard" style="display: none; margin-bottom: 20px;">
-                        <h3>Current Net Worth</h3>
-                        <p id="netWorthValue">₹0</p>
-                    </div>
-                    <div class="chart-wrapper" style="height: 250px;">
-                        <canvas id="networthTrendChart"></canvas>
-                    </div>
-                </section>
 
-                <section class="goals-manager" style="margin-top: 40px;">
+                    <div class="analytics-card"
+                        style="margin-bottom: 24px; text-align: center; padding: 40px 20px; border-top: 2px solid #8b5cf6 !important;">
+                        <p
+                            style="color: var(--text-muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px;">
+                            Total Net Worth</p>
+                        <h1 id="netWorthValue"
+                            style="font-size: clamp(2.5rem, 5vw, 4rem); margin: 10px 0; color: #ffffff;">₹0</h1>
+                        <p id="baseLiquidNw"
+                            style="color: #3b82f6; font-size: 0.9rem; font-weight: 500; background: rgba(59, 130, 246, 0.1); display: inline-block; padding: 6px 12px; border-radius: 20px;">
+                            Liquid: ₹0 &nbsp;|&nbsp; Assets: ₹0 &nbsp;|&nbsp; Debt: ₹0
+                        </p>
+                    </div>
+
+                    <div class="analytics-grid">
+                        <div class="card" style="padding: 24px; cursor: default;">
+                            <h3 style="margin-bottom: 4px;">Movable Assets</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Vehicles,
+                                Jewellery, Tech, Art</p>
+
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                                <select id="movableCategory">
+                                    <option value="Vehicle">Vehicle</option>
+                                    <option value="Jewellery">Jewellery</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Collectibles">Art / Collectibles</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input type="text" id="movableName" placeholder="Asset Name (e.g., Honda City)">
+                                <input type="number" id="movableValue" placeholder="Current Value (₹)">
+                                <button onclick="addCustomAsset('movable')"
+                                    style="background: #10b981; margin-top: 5px;">+ Add Movable Asset</button>
+                            </div>
+                            <div id="movableList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+
+                        <div class="card" style="padding: 24px; cursor: default;">
+                            <h3 style="margin-bottom: 4px;">Immovable Assets</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Real Estate,
+                                Land, Enterprise</p>
+
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                                <select id="immovableCategory">
+                                    <option value="Real Estate">House / Apartment</option>
+                                    <option value="Land">Land / Plot</option>
+                                    <option value="Enterprise">Commercial / Business</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input type="text" id="immovableName" placeholder="Asset Name (e.g., Ancestral Home)">
+                                <input type="number" id="immovableValue" placeholder="Current Value (₹)">
+                                <button onclick="addCustomAsset('immovable')"
+                                    style="background: #3b82f6; margin-top: 5px;">+ Add Immovable Asset</button>
+                            </div>
+                            <div id="immovableList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                    </div>
+                    <h3
+                        style="margin-top: 36px; margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+                        Liabilities & Loans</h3>
+
+                    <div class="analytics-grid">
+                        <div class="card"
+                            style="padding: 24px; cursor: default; border-top: 2px solid #ef4444 !important;">
+                            <h3 style="margin-bottom: 4px;">Bank Loans</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Mortgages,
+                                Auto Loans, Education</p>
+
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                                <input type="text" id="bankLoanName" placeholder="Bank Name (e.g., SBI, HDFC)">
+                                <input type="text" id="bankLoanAcc" placeholder="Account No. (Last 4 digits)">
+                                <input type="text" id="bankLoanPurpose" placeholder="Purpose (e.g., Home Loan)">
+                                <input type="number" id="bankLoanAmount" placeholder="Principal Amount (₹)">
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="number" id="bankLoanRate" placeholder="Interest (%)"
+                                        style="width: 50%;">
+                                    <input type="number" id="bankLoanTime" placeholder="Time (Years)"
+                                        style="width: 50%;">
+                                </div>
+                                <button onclick="addLoan('bank')" style="background: #ef4444; margin-top: 5px;">+ Add
+                                    Bank Loan</button>
+                            </div>
+                            <div id="bankLoanList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+
+                        <div class="card"
+                            style="padding: 24px; cursor: default; border-top: 2px solid #f97316 !important;">
+                            <h3 style="margin-bottom: 4px;">Other Loans</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Friends,
+                                Family, Private Lenders</p>
+
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                                <input type="text" id="otherLoanSource" placeholder="Source (e.g., Friends)">
+                                <input type="text" id="otherLoanName" placeholder="Lender name (e.g., John Doe)">
+                                <input type="text" id="otherLoanPurpose" placeholder="Purpose (e.g., Personal)">
+                                <input type="number" id="otherLoanAmount" placeholder="Principal Amount (₹)">
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="number" id="otherLoanRate" placeholder="Interest (%)"
+                                        style="width: 50%;">
+                                    <input type="number" id="otherLoanTime" placeholder="Time (Years)"
+                                        style="width: 50%;">
+                                </div>
+                                <button onclick="addLoan('other')" style="background: #f97316; margin-top: 5px;">+ Add
+                                    Other Loan</button>
+                            </div>
+                            <div id="otherLoanList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+
+            <div id="goals-view" class="view">
+                <section class="goals-manager">
                     <div class="section-header">
                         <h2>Savings Goals</h2>
                         <button onclick="showGoalModal()">➕ Add Goal</button>
@@ -229,7 +372,14 @@
                     <div class="table-container">
                         <table id="investmentsTable">
                             <thead>
-                                <tr><th>Asset</th><th>Qty</th><th>Avg Price</th><th>Current Price</th><th>P&L</th><th>Actions</th></tr>
+                                <tr>
+                                    <th>Asset</th>
+                                    <th>Qty</th>
+                                    <th>Avg Price</th>
+                                    <th>Current Price</th>
+                                    <th>P&L</th>
+                                    <th>Actions</th>
+                                </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -259,13 +409,24 @@
             <h3>Quick Tools</h3>
             <div class="tools-grid">
                 <div class="tool-card" onclick="showEMICalculator()">
-                    <h4>EMI Calculator</h4><p>Calculate loan payments</p>
+                    <h4>EMI Calculator</h4>
+                    <p>Calculate loan payments</p>
                 </div>
                 <div class="tool-card" onclick="showCurrencyConverter()">
-                    <h4>Currency Converter</h4><p>Live exchange rates</p>
+                    <h4>Currency Converter</h4>
+                    <p>Live exchange rates</p>
                 </div>
                 <div class="tool-card" onclick="showDebtPlanner()">
-                    <h4>Debt Payoff</h4><p>Optimal repayment plan</p>
+                    <h4>Debt Payoff</h4>
+                    <p>Optimal repayment plan</p>
+                </div>
+                <div class="tool-card" onclick="showFIRECalculator()">
+                    <h4>FIRE Planner</h4>
+                    <p>When can you retire?</p>
+                </div>
+                <div class="tool-card" onclick="showTaxEstimator()">
+                    <h4>Tax Estimator</h4>
+                    <p>Quick income tax check</p>
                 </div>
             </div>
         </div>
@@ -277,21 +438,214 @@
             <h3 id="transactionModalTitle">New Transaction</h3>
             <div class="modal-form">
                 <input type="date" id="transactionDate">
-                <select id="transactionCategory"></select>
-                <input type="number" id="transactionAmount" placeholder="Amount">
                 <select id="transactionType">
                     <option value="expense">Expense</option>
                     <option value="income">Income</option>
                 </select>
+                <select class="account-dropdown" id="modalTransactionAccount">
+                    <option value="">Select Account</option>
+                </select>
+                <select id="transactionCategory"></select>
+                <input type="number" id="transactionAmount" placeholder="Amount (e.g., 500)">
                 <input type="text" id="transactionNotes" placeholder="Notes (optional)">
-                <div class="modal-buttons">
-                    <button onclick="saveTransaction()">Save</button>
-                    <button onclick="closeTransactionModal()" class="secondary" style="background:transparent; border:1px solid #ccc; color:inherit;">Cancel</button>
+                <div class="modal-buttons"><button onclick="saveTransaction()">Save</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="accountModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAccountModal()">&times;</span>
+            <h3>Add Bank Account</h3>
+            <div class="modal-form">
+                <input type="text" id="accBankName" placeholder="Bank Name (e.g., HDFC, SBI)">
+                <input type="text" id="accHolderName" placeholder="Account Holder Name">
+                <input type="text" id="accNumber" placeholder="Account Number (Last 4 digits)">
+                <select id="accType">
+                    <option value="Savings">Savings</option>
+                    <option value="Current">Current</option>
+                    <option value="Loan">Loan</option>
+                </select>
+                <select id="accOwnership">
+                    <option value="Individual">Individual</option>
+                    <option value="Joint">Joint Account</option>
+                </select>
+                <input type="number" id="accInitialBalance" placeholder="Current Balance (₹)">
+                <div class="modal-buttons"><button onclick="saveAccount()">Save Account</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="transferModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTransferModal()">&times;</span>
+            <h3>Transfer Money</h3>
+            <div class="modal-form">
+                <label>From Account:</label><select id="transferFrom"></select>
+                <label>To Account:</label><select id="transferTo"></select>
+                <input type="number" id="transferAmount" placeholder="Amount to Transfer">
+                <input type="text" id="transferNotes" placeholder="Notes (optional)">
+                <div class="modal-buttons"><button onclick="executeTransfer()">Transfer</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userManualModal" class="modal">
+        <div class="modal-content" style="max-width: 720px;">
+            <span class="close" onclick="closeUserManual()">&times;</span>
+            <h3>FinancePro User Guide</h3>
+            <div class="modal-form" style="gap: 12px; font-size: 0.95rem; color: var(--text-muted); line-height: 1.5;">
+                <p><strong style="color: var(--text-main);">FinancePro</strong> – Use the floating 3D nodes to navigate
+                    the app.</p>
+                <p><strong style="color: var(--text-main);">Dashboard Stats</strong> – See total Income, Expenses, and
+                    Savings.</p>
+                <p><strong style="color: var(--text-main);">Transactions</strong> – Log every income and expense,
+                    search/filter, and export CSV.</p>
+                <p><strong style="color: var(--text-main);">Budget Insights</strong> – Track expense distribution,
+                    Budget vs Actual, and your Financial Health Score.</p>
+                <p><strong style="color: var(--text-main);">Net Worth Tracker</strong> – Enter Assets/Liabilities to
+                    calculate Net Worth. Create savings goals.</p>
+                <p><strong style="color: var(--text-main);">Investments</strong> – Add assets with quantity and prices
+                    to track portfolio P&L.</p>
+                <p><strong style="color: var(--text-main);">Subscriptions</strong> – Track fixed monthly costs and see
+                    your total burn rate.</p>
+                <p><strong style="color: var(--text-main);">Quick Tools</strong> – Calculators for EMI, Currency, FIRE,
+                    and Taxes.</p>
+            </div>
+        </div>
+    </div>
+    <div id="goalModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGoalModal()">&times;</span>
+            <h3>Create Savings Goal</h3>
+            <div class="modal-form">
+                <input type="text" id="goalName" placeholder="Goal Name (e.g., Vacation)">
+                <input type="number" id="goalTarget" placeholder="Target Amount (₹)">
+                <label style="font-size: 0.9rem; color: var(--text-muted);">Where will this money be stored?</label>
+                <select class="account-dropdown" id="goalAccount"></select>
+                <input type="date" id="goalDeadline" title="Target Deadline">
+                <div class="modal-buttons"><button onclick="saveNewGoal()">Create Goal</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fundGoalModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFundGoalModal()">&times;</span>
+            <h3 id="fundGoalTitle">Add Funds to Goal</h3>
+            <div class="modal-form">
+                <input type="hidden" id="fundGoalId">
+                <label style="font-size: 0.9rem; color: var(--text-muted);">Transfer money FROM:</label>
+                <select class="account-dropdown" id="fundSourceAccount"></select>
+                <input type="number" id="fundAmount" placeholder="Amount to Add (₹)">
+                <div class="modal-buttons"><button onclick="executeGoalFunding()">Transfer Funds</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="investmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeInvestmentModal()">&times;</span>
+            <h3>Purchase Asset</h3>
+            <div class="modal-form">
+                <input type="text" id="invTicker" placeholder="Asset Name (e.g., NIFTY50, Gold)">
+                <input type="number" id="invQty" placeholder="Quantity">
+                <input type="number" id="invPrice" placeholder="Buy Price Per Unit (₹)">
+                <label style="font-size: 0.9rem; color: var(--text-muted);">Pay from Bank Account:</label>
+                <select class="account-dropdown" id="invAccount"></select>
+                <div class="modal-buttons"><button onclick="saveInvestment()">Buy Asset</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sellInvestmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSellInvestmentModal()">&times;</span>
+            <h3 id="sellInvTitle">Sell Asset</h3>
+            <div class="modal-form">
+                <input type="hidden" id="sellInvId">
+                <p id="sellInvDetails" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px;"></p>
+                <p id="sellInvBank" style="color: #3b82f6; font-size: 0.85rem; margin-bottom: 15px;"></p>
+                <input type="number" id="sellPrice" placeholder="Selling Price Per Unit (₹)">
+                <div class="modal-buttons"><button onclick="executeSellInvestment()">Execute Trade</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="subscriptionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSubscriptionModal()">&times;</span>
+            <h3>Add Subscription</h3>
+            <div class="modal-form">
+                <input type="text" id="subName" placeholder="Name (e.g., Netflix, Gym)">
+                <input type="number" id="subAmount" placeholder="Monthly Cost (₹)">
+                <input type="number" id="subDay" placeholder="Billing Day (1-31)" min="1" max="31">
+                <label style="font-size: 0.9rem; color: var(--text-muted);">Linked Bank Account:</label>
+                <select class="account-dropdown" id="subAccount"></select>
+                <div class="modal-buttons"><button onclick="saveSubscription()">Save Subscription</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="repayLoanModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRepayModal()">&times;</span>
+            <h3 id="repayLoanTitle">Repay Loan</h3>
+            <div class="modal-form">
+                <input type="hidden" id="repayLoanId">
+                <p id="repayLoanDetails"
+                    style="color: #ef4444; font-size: 0.95rem; font-weight: bold; margin-bottom: 15px;"></p>
+                <label style="font-size: 0.9rem; color: var(--text-muted);">Transfer money FROM:</label>
+                <select class="account-dropdown" id="repaySourceAccount"></select>
+                <input type="number" id="repayAmount" placeholder="Amount to Repay (₹)">
+                <div class="modal-buttons"><button onclick="executeLoanRepayment()" style="background: #3b82f6;">Make
+                        Repayment</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sellCustomAssetModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSellCustomAssetModal()">&times;</span>
+            <h3 id="sellCustomTitle">Sell Asset</h3>
+            <div class="modal-form">
+                <input type="hidden" id="sellCustomId">
+                <p id="sellCustomDetails" style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px;"></p>
+                
+                <label style="font-size: 0.9rem; color: var(--text-muted);">Deposit money TO:</label>
+                <select class="account-dropdown" id="sellCustomAccount"></select>
+                
+                <input type="number" id="sellCustomPrice" placeholder="Final Selling Price (₹)">
+                
+                <div class="modal-buttons" style="display: flex; flex-direction: column; gap: 10px;">
+                    <button onclick="executeSellCustomAsset()" style="background: #10b981;">Confirm Sale</button>
+                    <button onclick="deleteCustomAssetMistake()" style="background: transparent; border: 1px solid var(--danger); color: var(--danger);">🗑️ Just delete (Typo/Mistake)</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="js/script.js"></script>
+    <div id="repayOtherLoanModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRepayOtherLoanModal()">&times;</span>
+            <h3 id="repayOtherLoanTitle">Repay Loan</h3>
+            <div class="modal-form">
+                <input type="hidden" id="repayOtherLoanId">
+                <p id="repayOtherLoanDetails" style="color: #f97316; font-size: 0.95rem; font-weight: bold; margin-bottom: 15px;"></p>
+                <label style="font-size: 0.9rem; color: var(--text-muted);">Pay from Bank Account:</label>
+                <select class="account-dropdown" id="repayOtherSourceAccount"></select>
+                <input type="number" id="repayOtherAmount" placeholder="Amount to Repay (₹)">
+                <div class="modal-buttons"><button onclick="executeOtherLoanRepayment()" style="background: #f97316;">Make Repayment</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/state.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/finance.js"></script>
+    <script src="js/tools.js"></script>
+    <script src="js/app.js"></script>
 </body>
+
 </html>
