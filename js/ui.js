@@ -51,9 +51,9 @@ function applyTheme() {
     if (isDark) document.body.classList.add('dark');
     else document.body.classList.remove('dark');
 
-    // Update Button Text
-    const btn = document.querySelector('.theme-toggle');
-    if (btn) btn.innerText = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+    // Update Button to purely Emoji (Sun to switch to light, Moon to switch to dark)
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.innerText = isDark ? '☀️' : '🌙';
 
     // THE NUCLEAR SPLINE SWAP: Overwrite the innerHTML completely
     const splineWrapper = document.getElementById('spline-wrapper');
@@ -62,7 +62,6 @@ function applyTheme() {
             ? 'https://prod.spline.design/vnLh5ZNRjBQEz9V4/scene.splinecode'  // Dark Model
             : 'https://prod.spline.design/eCOXc8L2lS9PB6Dc/scene.splinecode'; // Light Model
 
-        // This forces the browser to completely destroy the old viewer and load the new one
         splineWrapper.innerHTML = `<spline-viewer url="${targetUrl}"></spline-viewer>`;
     }
 
@@ -170,3 +169,31 @@ function showAccountModal() { document.getElementById('accountModal').style.disp
 function closeAccountModal() { document.getElementById('accountModal').style.display = 'none'; }
 function showTransferModal() { updateAccountDropdowns(); document.getElementById('transferModal').style.display = 'block'; }
 function closeTransferModal() { document.getElementById('transferModal').style.display = 'none'; }
+
+function toggleMenu() {
+    const menu = document.getElementById('navMenu');
+    const btn = document.querySelector('.hamburger-btn');
+    const overlay = document.getElementById('menuOverlay');
+    const hub = document.querySelector('.hero-3d-container'); // Grab the 3D container
+    
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
+    overlay.classList.toggle('active');
+    
+    // Disable touches on the 3D scene when menu is open
+    if (hub) hub.style.pointerEvents = menu.classList.contains('open') ? 'none' : 'auto';
+}
+
+function closeMenu() {
+    const menu = document.getElementById('navMenu');
+    const btn = document.querySelector('.hamburger-btn');
+    const overlay = document.getElementById('menuOverlay');
+    const hub = document.querySelector('.hero-3d-container');
+    
+    if (menu && menu.classList.contains('open')) {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        overlay.classList.remove('active');
+        if (hub) hub.style.pointerEvents = 'auto'; // Re-enable touches
+    }
+}
