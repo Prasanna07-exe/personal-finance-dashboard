@@ -12,6 +12,7 @@
 ## 🎯 Overview
 
 **FinancePro** is a modern, interactive personal finance dashboard built with vanilla JavaScript, offering a startup-grade user experience with powerful financial management tools. Track your wealth, optimize spending, and achieve financial goals—all in one beautiful, responsive application.
+Site live on: https://prasanna07-exe.github.io/personal-finance-dashboard/
 
 ### Key Highlights
 - 🎨 **Beautiful UI** with glassmorphism design and dark mode
