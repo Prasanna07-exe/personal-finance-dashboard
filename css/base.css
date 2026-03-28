@@ -1,0 +1,184 @@
+:root {
+    --text-main: #0f172a;
+    --text-muted: #5d687c;
+    --glass-bg: rgba(255, 255, 255, 0.62);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 18px 44px rgba(15, 23, 42, 0.12);
+    --accent: #4f7cff;
+    --success: #16a34a;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --tiltX: 0deg;
+    --tiltY: 0deg;
+    --lift: 0px;
+    --scale: 1;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    color: var(--text-main);
+    background: radial-gradient(circle at 8% 18%, rgba(99, 102, 241, 0.30) 0%, transparent 33%),
+        radial-gradient(circle at 88% 6%, rgba(45, 212, 191, 0.24) 0%, transparent 34%),
+        radial-gradient(circle at 52% 100%, rgba(147, 197, 253, 0.24) 0%, transparent 42%),
+        linear-gradient(135deg, #edf2ff 0%, #f8fbff 46%, #effcf7 100%);
+    position: relative;
+    transition: background 0.45s ease, color 0.35s ease;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: -12%;
+    z-index: 0;
+    background: radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.32) 0%, transparent 52%),
+        radial-gradient(circle at 100% 100%, rgba(129, 140, 248, 0.32) 0%, transparent 60%),
+        radial-gradient(circle at 50% 20%, rgba(244, 249, 255, 0.32) 0%, transparent 60%);
+    opacity: 0.85;
+    filter: blur(1.5px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    animation: backgroundDrift 48s ease-in-out infinite alternate;
+}
+
+/* === ABSOLUTE PURE BLACK DARK MODE === */
+body.dark {
+    background: #000000 !important;
+    color: #f8fafc !important;
+}
+
+body.dark::before {
+    display: none !important;
+}
+
+/* Layout - Full Width */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 0;
+    padding: 30px 40px;
+    width: 100vw;
+    max-width: 100%;
+}
+
+.view {
+    display: none;
+    animation: fadeInUp 0.4s ease both;
+}
+
+.view.active {
+    display: block;
+}
+
+/* Base Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes numberPop {
+    0% {
+        opacity: 0;
+        transform: translateY(6px) scale(0.98);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateY(0) scale(1.03);
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes cardGradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes insightGlow {
+    0% {
+        box-shadow: 0 6px 24px rgba(79, 124, 255, 0.18);
+    }
+
+    50% {
+        box-shadow: 0 10px 32px rgba(79, 124, 255, 0.30);
+    }
+
+    100% {
+        box-shadow: 0 6px 24px rgba(79, 124, 255, 0.18);
+    }
+}
+
+@keyframes ringGlow {
+    0% {
+        box-shadow: 0 0 0 rgba(34, 197, 94, 0.0);
+    }
+
+    50% {
+        box-shadow: 0 0 18px rgba(34, 197, 94, 0.35);
+    }
+
+    100% {
+        box-shadow: 0 0 0 rgba(34, 197, 94, 0.0);
+    }
+}
+
+@keyframes backgroundDrift {
+    0% {
+        transform: translate3d(0, 0, 0) scale(1);
+        background-position: 0% 0%, 100% 100%, 50% 20%;
+    }
+
+    50% {
+        transform: translate3d(8px, -12px, 0) scale(1.03);
+        background-position: 10% 10%, 90% 90%, 52% 18%;
+    }
+
+    100% {
+        transform: translate3d(-6px, 10px, 0) scale(1.02);
+        background-position: -5% 15%, 105% 85%, 48% 24%;
+    }
+}
+
+@keyframes rippleExpand {
+    to {
+        transform: translate(-50%, -50%) scale(3.2);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 720px) {
+    .main-content {
+        padding: 16px 14px 26px;
+    }
+}

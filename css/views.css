@@ -1,0 +1,192 @@
+/* Transactions View */
+.transactions {
+    margin: 40px 0;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.transaction-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.table-container {
+    background: var(--glass-bg);
+    border-radius: 18px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    box-shadow: var(--glass-shadow);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th,
+td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+th {
+    background: rgba(79, 124, 255, 0.15);
+    font-weight: 600;
+    color: var(--accent);
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--glass-border);
+}
+
+/* Net Worth View */
+.net-worth-section {
+    margin: 32px 0 36px;
+}
+
+.networth-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Goals View */
+.goals-manager {
+    margin-top: 56px;
+}
+
+.goals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.goal-card {
+    padding: 20px;
+    border-radius: 16px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Tools View */
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 20px;
+}
+
+.tool-card {
+    padding: 18px 18px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.16);
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tool-card h4 {
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tool-card h4::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #4f46e5, #22c55e);
+}
+
+.tool-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.24);
+    box-shadow: var(--glass-shadow);
+}
+
+/* ========================================= */
+/* VIEWS: ABSOLUTE PURE BLACK OVERRIDES      */
+/* ========================================= */
+
+body.dark .table-container,
+body.dark .goal-card,
+body.dark .tool-card {
+    background: #000000 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #262626 !important;
+    box-shadow: none !important;
+}
+
+body.dark table th,
+body.dark table td {
+    background: #000000 !important;
+    border-bottom: 1px solid #262626 !important;
+}
+
+body.dark tbody tr:hover,
+body.dark .tool-card:hover {
+    background: #0a0a0a !important;
+    border-color: #404040 !important;
+}
+
+@media (max-width: 768px) {
+
+    .transaction-controls,
+    .networth-inputs,
+    .modal-buttons,
+    .tools-grid,
+    .table-footer {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+}
