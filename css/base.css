@@ -24,6 +24,7 @@
 body {
     min-height: 100vh;
     color: var(--text-main);
+    overflow-x: hidden;
     background: radial-gradient(circle at 8% 18%, rgba(99, 102, 241, 0.30) 0%, transparent 33%),
         radial-gradient(circle at 88% 6%, rgba(45, 212, 191, 0.24) 0%, transparent 34%),
         radial-gradient(circle at 52% 100%, rgba(147, 197, 253, 0.24) 0%, transparent 42%),
@@ -62,7 +63,6 @@ body.dark::before {
     display: flex;
     min-height: 100vh;
     width: 100%;
-    overflow-x: hidden;
 }
 
 .main-content {
@@ -328,4 +328,93 @@ body:not(.dark) button[onclick*="Export"]:hover {
     border-color: transparent !important;
     box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
     transform: translateY(-2px) !important;
+}
+
+/* ==============================================================
+   8. AI Insight "Easter Egg" Float Fix
+   ============================================================== */
+
+/* Ensure the chart box acts as an anchor for the floating easter egg */
+.chart-box {
+    position: relative !important; 
+}
+
+/* Force the AI Insight box to float over the bottom right of the graph */
+.insights {
+    position: absolute !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 100 !important;
+    width: auto !important;
+    max-width: 320px !important;
+    margin: 0 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Make sure the AI box looks sleek in Light Mode too */
+body:not(.dark) .insights {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* Fix text colors inside the AI box for Light Mode */
+body:not(.dark) .insights h3,
+body:not(.dark) .insights p {
+    color: #0f172a !important;
+}
+body:not(.dark) .insights .close {
+    color: #64748b !important;
+}
+/* ==============================================================
+   8. AI Insight "Easter Egg" FIXED POSITIONING
+   ============================================================== */
+
+.insights {
+    /* Change 'absolute' to 'fixed' to keep it in the screen corner */
+    position: fixed !important; 
+    bottom: 30px !important;
+    right: 30px !important;
+    
+    /* Ensure it stays above everything else */
+    z-index: 9999 !important; 
+    
+    width: auto !important;
+    max-width: 320px !important;
+    margin: 0 !important;
+    border-radius: 16px !important;
+    
+    /* Add a stronger shadow to make it "float" */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+/* Light Mode specific colors for the Easter Egg */
+body:not(.dark) .insights {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: #0f172a !important;
+}
+
+/* Animation to make the 'Easter Egg' pulse slightly so the user notices it */
+.insights {
+    animation: eggPulse 3s infinite ease-in-out;
+}
+
+@keyframes eggPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+/* Hover state to stop pulse and lift higher */
+.insights:hover {
+    transform: translateY(-5px) scale(1.05) !important;
+    animation-play-state: paused;
 }
