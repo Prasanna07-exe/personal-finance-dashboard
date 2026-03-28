@@ -18,25 +18,56 @@
 <body class="dark">
     <div class="app-container">
         <main class="main-content">
-            <header class="top-header" style="z-index: 100;">
+            <header class="top-header" style="z-index: 999;">
                 <div class="title-section" style="display: flex; align-items: center; gap: 16px;">
                     <button id="backToHubBtn" onclick="switchView('home-hub')"
                         style="display: none; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
-                        ⭠ Back to Hub
+                        ⭠ Back
                     </button>
                     <div>
                         <h1 id="viewTitle">FinancePro</h1>
-                        <p>Startup-grade money intelligence</p>
+                        <p id="viewSubtitle">Startup-grade money intelligence</p>
                     </div>
                 </div>
-                <div class="toggle-section">
-                    <button class="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
-                    <button onclick="downloadReport()">Get Report</button>
-                    <button onclick="showQuickTools()">Tools</button>
-                    <button onclick="showUserManual()">Help</button>
+
+                <div class="header-right-actions" style="display: flex; align-items: center; gap: 12px;">
+
+                    <div class="toggle-section" id="navMenu">
+                        <button onclick="downloadReport(); closeMenu();">Get Report</button>
+                        <button onclick="showQuickTools(); closeMenu();">Tools</button>
+                        <button onclick="showUserManual(); closeMenu();">Help</button>
+                        <button id="themeToggleBtn" onclick="toggleTheme()"
+                            style="background: transparent !important; border: none !important; box-shadow: none !important; font-size: 1.4rem; padding: 4px; cursor: pointer; transition: transform 0.2s;">
+                            ☀️
+                        </button>
+
+                        <div class="mobile-only-nav">
+                            <p class="nav-label">Navigation</p>
+                            <button class="nav-btn" onclick="switchView('home-hub'); closeMenu();">🌌 3D Hub</button>
+                            <button class="nav-btn" onclick="switchView('overview'); closeMenu();">📊 Dashboard
+                                Stats</button>
+                            <button class="nav-btn" onclick="switchView('transactions-view'); closeMenu();">💳
+                                Transactions</button>
+                            <button class="nav-btn" onclick="switchView('budget-view'); closeMenu();">📉 Budget
+                                Insights</button>
+                            <button class="nav-btn" onclick="switchView('wealth-view'); closeMenu();">💰 Net
+                                Worth</button>
+                            <button class="nav-btn" onclick="switchView('goals-view'); closeMenu();">🎯 Savings
+                                Goals</button>
+                            <button class="nav-btn" onclick="switchView('investments-view'); closeMenu();">📈
+                                Investments</button>
+                        </div>
+                    </div>
+
+
+
+                    <button class="hamburger-btn" onclick="toggleMenu()">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </button>
                 </div>
             </header>
-
             <div id="home-hub" class="view active">
                 <div class="hero-3d-container">
                     <div id="spline-wrapper" style="position: absolute; width: 100%; height: 100%; z-index: 1;">
@@ -68,6 +99,9 @@
                     <div class="node-orbit pos-8" onclick="switchView('accounts-view')">
                         <span>Bank Accounts</span>
                     </div>
+                    <button class="mobile-quick-add" onclick="showAddTransactionModal()">
+                         Quick Add Transaction
+                    </button>
                 </div>
             </div>
             <div id="accounts-view" class="view">
@@ -610,16 +644,19 @@
             <h3 id="sellCustomTitle">Sell Asset</h3>
             <div class="modal-form">
                 <input type="hidden" id="sellCustomId">
-                <p id="sellCustomDetails" style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px;"></p>
-                
+                <p id="sellCustomDetails" style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px;">
+                </p>
+
                 <label style="font-size: 0.9rem; color: var(--text-muted);">Deposit money TO:</label>
                 <select class="account-dropdown" id="sellCustomAccount"></select>
-                
+
                 <input type="number" id="sellCustomPrice" placeholder="Final Selling Price (₹)">
-                
+
                 <div class="modal-buttons" style="display: flex; flex-direction: column; gap: 10px;">
                     <button onclick="executeSellCustomAsset()" style="background: #10b981;">Confirm Sale</button>
-                    <button onclick="deleteCustomAssetMistake()" style="background: transparent; border: 1px solid var(--danger); color: var(--danger);">🗑️ Just delete (Typo/Mistake)</button>
+                    <button onclick="deleteCustomAssetMistake()"
+                        style="background: transparent; border: 1px solid var(--danger); color: var(--danger);">🗑️ Just
+                        delete (Typo/Mistake)</button>
                 </div>
             </div>
         </div>
@@ -631,15 +668,17 @@
             <h3 id="repayOtherLoanTitle">Repay Loan</h3>
             <div class="modal-form">
                 <input type="hidden" id="repayOtherLoanId">
-                <p id="repayOtherLoanDetails" style="color: #f97316; font-size: 0.95rem; font-weight: bold; margin-bottom: 15px;"></p>
+                <p id="repayOtherLoanDetails"
+                    style="color: #f97316; font-size: 0.95rem; font-weight: bold; margin-bottom: 15px;"></p>
                 <label style="font-size: 0.9rem; color: var(--text-muted);">Pay from Bank Account:</label>
                 <select class="account-dropdown" id="repayOtherSourceAccount"></select>
                 <input type="number" id="repayOtherAmount" placeholder="Amount to Repay (₹)">
-                <div class="modal-buttons"><button onclick="executeOtherLoanRepayment()" style="background: #f97316;">Make Repayment</button></div>
+                <div class="modal-buttons"><button onclick="executeOtherLoanRepayment()"
+                        style="background: #f97316;">Make Repayment</button></div>
             </div>
         </div>
     </div>
-
+    <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
     <script src="js/state.js"></script>
     <script src="js/charts.js"></script>
     <script src="js/ui.js"></script>
