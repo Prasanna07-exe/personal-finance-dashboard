@@ -3,7 +3,7 @@
 > **Startup-grade Money Intelligence at Your Fingertips** | Interactive wealth management & financial planning powered by AI insights
 
 [![Status](https://img.shields.io/badge/Status-Active-success)]() 
-[![License](https://img.shields.io/badge/License-MIT-blue)]()
+[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 [![Language](https://img.shields.io/badge/Language-JavaScript%20%7C%20HTML%20%7C%20CSS-yellow)]()
 [![GitHub Stars](https://img.shields.io/github/stars/Prasanna07-exe/personal-finance-dashboard?style=social)]()
 
@@ -14,6 +14,14 @@
 **FinancePro** is a modern, interactive personal finance dashboard built with vanilla JavaScript, offering a startup-grade user experience with powerful financial management tools. Track your wealth, optimize spending, and achieve financial goals—all in one beautiful, responsive application.
 Site live on: https://prasanna07-exe.github.io/personal-finance-dashboard/
 
+### Academic Context
+- This project was undertaken as part of coursework under the academic curriculum.
+- Semester: **[Update with your semester, e.g., Semester V / Semester VI]**
+- Course/Subject: **[Update with course title, e.g., Web Technologies / Frontend Development]**
+- Institution: **[Update with institution name]**
+
+When listing this project on Resume/LinkedIn, include the semester and course context to reflect academic progression.
+
 ### Key Highlights
 - 🎨 **Beautiful UI** with glassmorphism design and dark mode
 - 📊 **Real-time Analytics** with interactive charts (Chart.js)
@@ -23,6 +31,35 @@ Site live on: https://prasanna07-exe.github.io/personal-finance-dashboard/
 - 🚀 **PWA Ready** - installable as a web app
 - 📈 **AI-Powered Insights** detecting spending anomalies
 - ⚡ **Zero Dependencies** on databases—local storage only
+
+### Innovation & Original Contribution
+- Designed a multi-view finance workflow that connects transactions, accounts, goals, investments, subscriptions, and net worth in one state model.
+- Built custom full-data import flow (JSON) and sample-data loader for end-to-end demo/testing across all sections.
+- Implemented goal funding as real inter-account transfer logic (source account to goal-linked account) instead of isolated counters.
+- Developed a 3D hub navigation concept with smooth loader-to-scene transition for better onboarding experience.
+- Added privacy-first architecture: all user financial data remains local in browser storage by default.
+
+---
+
+## Ethical Use & Source Attribution
+
+This repository follows academic and ethical sharing expectations. External resources/libraries are acknowledged below.
+
+### Third-Party Libraries/Services
+- Chart.js: https://www.chartjs.org/
+- jsPDF: https://github.com/parallax/jsPDF
+- canvas-confetti: https://github.com/catdad/canvas-confetti
+- Spline Viewer/Web Component: https://docs.spline.design/
+
+### Visual/Interaction References
+- 3D scene rendering uses Spline-hosted scene URLs configured in the app.
+- Icons/emojis are Unicode characters rendered by the browser/OS.
+
+### Declaration
+- Core product design, application structure, data model, and implementation decisions are original work for academic use.
+- Where external tools/libraries are used, they are referenced in this README and should continue to be credited in derivative work.
+
+---
 
 ---
 
@@ -369,6 +406,8 @@ python -m http.server 8000
 
 This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file for details.
 
+For school/portfolio distribution, keep this LICENSE file and attribution section intact.
+
 ---
 
 ## 👨‍💻 Author
@@ -458,4 +497,4 @@ If this project helped you, please:
 
 [⬆ Back to top](#-financepro---personal-finance-dashboard)
 
-</div># personal-finance-dashboard
+</div>
