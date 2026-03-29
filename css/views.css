@@ -170,23 +170,98 @@ body.dark .tool-card:hover {
 }
 
 @media (max-width: 768px) {
+    /* Main container setup */
+    .transaction-controls {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important; /* Allows multi-row layout */
+        gap: 10px !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
 
-    .transaction-controls,
-    .networth-inputs,
-    .modal-buttons,
-    .tools-grid,
+    /* ROW 1: Force Search and Category to fill the top line completely */
+    #searchTransactions, 
+    #filterCategory {
+        flex: 1 1 calc(50% - 10px) !important; /* Forces 2 items per row */
+        min-width: 140px !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* ROW 2: Force Buttons to their own line below the search/filter */
+    .transaction-controls button {
+        flex: 1 1 30% !important; /* Forces 3 items per row on the second line */
+        margin-top: 5px !important;
+        padding: 12px 5px !important;
+        font-size: 0.85rem !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        white-space: nowrap !important;
+    }
+
+    /* Table & Structure Fixes */
+    .table-container {
+        margin-top: 25px !important; /* Extra space so buttons don't touch table */
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .table-footer {
-        flex-direction: column;
-        gap: 12px;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: center !important;
     }
 
     .section-header {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        text-align: center !important;
+        gap: 10px !important;
     }
 
-    .table-container {
-        overflow-x: auto;
+    /* Helper classes for other mobile elements */
+    .networth-inputs,
+    .modal-buttons,
+    .tools-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
     }
+
+    #budget-view .charts {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+
+    /* Ensure each chart box takes full width */
+    #budget-view .chart-box {
+        width: 100% !important;
+        min-height: 350px; /* Gives charts enough height to be readable */
+    }
+
+    /* Fix for the Forecast Chart which might have a span rule */
+    #budget-view .chart-box[style*="grid-column"] {
+        grid-column: auto !important;
+    }
+    #budget-view .chart-wrapper {
+        height: 220px !important; /* Reduced from 320px/350px */
+        margin: 0 auto;
+    }
+
+    /* Tighten up the chart boxes so they don't take too much vertical space */
+    #budget-view .chart-box {
+        padding: 15px !important;
+        min-height: unset !important; /* Remove the large min-height */
+    }
+
+    /* Make the titles a bit smaller to match the smaller charts */
+    #budget-view .chart-box h3 {
+        font-size: 0.9rem !important;
+        margin-bottom: 8px !important;
+    }
+    
 }
