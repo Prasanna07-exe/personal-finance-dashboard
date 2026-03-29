@@ -196,4 +196,7 @@ function closeMenu() {
         overlay.classList.remove('active');
         if (hub) hub.style.pointerEvents = 'auto'; // Re-enable touches
     }
+
+
+
 }
