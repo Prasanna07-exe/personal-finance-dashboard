@@ -26,7 +26,6 @@ function renderAll() {
     if (forecastChart) updateForecastChart();
     if (budgetChart) updateBudgetChart();
     if (networthChart) updateNetWorthChart();
-    if (weekdayChart) updateWeekdayChart();
 }
 
 function updateDashboardCards() {
@@ -49,36 +48,6 @@ function updateDashboardCards() {
     updateBudgetWarning(totalExpense); 
     updateSavingsGoal(totalIncome, savings); 
     updateFinancialHealthScore(totalIncome, totalExpense, savings);
-    updateNoSpendStreak();
-}
-
-function updateNoSpendStreak() {
-    const valueEl = document.getElementById('noSpendStreakValue');
-    const labelEl = document.getElementById('noSpendStreakLabel');
-    const badgeEl = document.getElementById('noSpendStreakBadge');
-
-    if (!valueEl && !badgeEl) return; // nothing to update
-
-    const expenses = (state.transactions || []).filter(t => t.type === 'expense');
-    if (expenses.length === 0) {
-        if (valueEl) valueEl.innerText = '0 days';
-        if (labelEl) labelEl.innerText = 'Start logging expenses to track your no-spend streak.';
-        if (badgeEl) badgeEl.innerText = 'No-spend streak: 0 days';
-        return;
-    }
-
-    const streak = typeof getNoSpendStreak === 'function' ? getNoSpendStreak() : 0;
-    const suffix = streak === 1 ? 'day' : 'days';
-
-    if (valueEl) valueEl.innerText = `${streak} ${suffix}`;
-    if (badgeEl) badgeEl.innerText = `No-spend streak: ${streak} ${suffix}`;
-
-    if (labelEl) {
-        if (streak === 0) labelEl.innerText = 'You spent today. Try a no-spend day tomorrow.';
-        else if (streak < 3) labelEl.innerText = 'Nice! Keep the streak going.';
-        else if (streak < 7) labelEl.innerText = '🔥 Strong streak! Stay disciplined.';
-        else labelEl.innerText = 'Legendary no-spend run. Stay consistent.';
-    }
 }
 
 function updateInsights(income, savings) {
