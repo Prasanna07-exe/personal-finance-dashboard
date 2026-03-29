@@ -19,17 +19,6 @@
     align-items: center;
 }
 
-.transaction-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: nowrap;
-}
-
-.transaction-actions button {
-    flex: 1;
-    white-space: nowrap;
-}
-
 .table-container {
     background: var(--glass-bg);
     border-radius: 18px;
@@ -68,15 +57,6 @@ tbody tr:hover {
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid var(--glass-border);
-}
-
-.no-spend-badge {
-    font-size: 0.78rem;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(34, 197, 94, 0.12);
-    color: #22c55e;
-    white-space: nowrap;
 }
 
 /* Net Worth View */
@@ -206,35 +186,7 @@ body.dark .tool-card:hover {
         text-align: center;
     }
 
-    .accounts-manager .transaction-controls {
-        flex-direction: row;
-        justify-content: center;
-        flex-wrap: nowrap;
-    }
-
-    .transactions {
-        margin: 20px 0;
-    }
-
-    .section-header h2 {
-        font-size: 1.25rem;
-    }
-
     .table-container {
         overflow-x: auto;
-    }
-
-    table {
-        font-size: 0.8rem;
-    }
-
-    th,
-    td {
-        padding: 10px 8px;
-    }
-
-    .transaction-actions {
-        width: 100%;
-        justify-content: center;
     }
 }
