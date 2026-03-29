@@ -19,6 +19,208 @@ function showDebtPlanner() {
     closeQuickTools(); alert("Avalanche vs Snowball Planner:\n\nBased on optimal financial modeling, prioritize paying off the highest-interest debt first (Avalanche method) to save the most money over time.");
 }
 
+function normalizeImportedState(payload) {
+    const safe = (payload && typeof payload === 'object') ? payload : {};
+    const base = { ...getDefaultState(), ...safe };
+
+    return {
+        ...base,
+        budget: Number(base.budget || 0),
+        income: Number(base.income || 0),
+        transactions: Array.isArray(base.transactions) ? base.transactions : [],
+        goals: Array.isArray(base.goals) ? base.goals : [],
+        investments: Array.isArray(base.investments) ? base.investments : [],
+        subscriptions: Array.isArray(base.subscriptions) ? base.subscriptions : [],
+        netWorthHistory: Array.isArray(base.netWorthHistory) ? base.netWorthHistory : [],
+        recurring: Array.isArray(base.recurring) ? base.recurring : [],
+        expenseEntries: Array.isArray(base.expenseEntries) ? base.expenseEntries : [],
+        accounts: Array.isArray(base.accounts) ? base.accounts : [],
+        customAssets: Array.isArray(base.customAssets) ? base.customAssets : [],
+        customLoans: Array.isArray(base.customLoans) ? base.customLoans : [],
+        categoryBudgets: (base.categoryBudgets && typeof base.categoryBudgets === 'object') ? base.categoryBudgets : {},
+        theme: base.theme === 'dark' ? 'dark' : 'light'
+    };
+}
+
+function refreshAfterDataImport() {
+    if (typeof saveState === 'function') saveState();
+    if (typeof applyTheme === 'function') applyTheme();
+    if (typeof renderAll === 'function') renderAll();
+    if (typeof renderAccounts === 'function') renderAccounts();
+    if (typeof renderCustomAssets === 'function') renderCustomAssets();
+    if (typeof renderLoans === 'function') renderLoans();
+    if (typeof updateAccountDropdowns === 'function') updateAccountDropdowns();
+    if (typeof syncDashboard === 'function') syncDashboard();
+    if (typeof updateCharts === 'function') updateCharts();
+}
+
+function createSampleState() {
+    const today = new Date();
+    const iso = (offsetDays = 0) => {
+        const d = new Date(today);
+        d.setDate(d.getDate() + offsetDays);
+        return d.toISOString().split('T')[0];
+    };
+
+    const accSalary = {
+        id: 'acc_demo_salary',
+        bankName: 'HDFC Bank',
+        holder: 'Demo User',
+        accNumber: '4821',
+        type: 'Savings',
+        ownership: 'Individual',
+        balance: 182500
+    };
+
+    const accSpending = {
+        id: 'acc_demo_spend',
+        bankName: 'SBI',
+        holder: 'Demo User',
+        accNumber: '9154',
+        type: 'Savings',
+        ownership: 'Individual',
+        balance: 42500
+    };
+
+    const accLoan = {
+        id: 'acc_demo_loan',
+        bankName: 'ICICI Home Loan',
+        holder: 'Demo User',
+        accNumber: '7301',
+        type: 'Loan',
+        ownership: 'Individual',
+        balance: -980000
+    };
+
+    const transactions = [
+        { id: 'tx_demo_1', date: iso(-20), category: 'Salary', amount: 85000, type: 'income', notes: 'Monthly salary', accountId: accSalary.id },
+        { id: 'tx_demo_2', date: iso(-18), category: 'Transfer', amount: 15000, type: 'transfer', notes: 'To spending account', accountId: accSalary.id, toAccountId: accSpending.id },
+        { id: 'tx_demo_3', date: iso(-16), category: 'Groceries', amount: 4200, type: 'expense', notes: 'Weekly groceries', accountId: accSpending.id },
+        { id: 'tx_demo_4', date: iso(-14), category: 'Rent', amount: 18000, type: 'expense', notes: 'House rent', accountId: accSpending.id },
+        { id: 'tx_demo_5', date: iso(-12), category: 'Utilities', amount: 2600, type: 'expense', notes: 'Electricity + Internet', accountId: accSpending.id },
+        { id: 'tx_demo_6', date: iso(-10), category: 'Investment', amount: 10000, type: 'expense', notes: 'Mutual fund SIP', accountId: accSalary.id },
+        { id: 'tx_demo_7', date: iso(-8), category: 'Freelance', amount: 12000, type: 'income', notes: 'Project payment', accountId: accSalary.id },
+        { id: 'tx_demo_8', date: iso(-6), category: 'Loan Repayment', amount: 15000, type: 'expense', notes: 'Home loan EMI', accountId: accSalary.id },
+        { id: 'tx_demo_9', date: iso(-4), category: 'Entertainment', amount: 1800, type: 'expense', notes: 'Weekend movie', accountId: accSpending.id },
+        { id: 'tx_demo_10', date: iso(-2), category: 'Transport', amount: 2200, type: 'expense', notes: 'Fuel and cab', accountId: accSpending.id }
+    ];
+
+    return normalizeImportedState({
+        income: 97000,
+        budget: 60000,
+        expenseEntries: [],
+        transactions,
+        netWorthHistory: [
+            { date: iso(-90), value: -220000 },
+            { date: iso(-60), value: -120000 },
+            { date: iso(-30), value: 15000 },
+            { date: iso(0), value: 98000 }
+        ],
+        goals: [
+            { id: 'goal_demo_emergency', name: 'Emergency Fund', target: 300000, current: 125000, deadline: iso(180), accountId: accSalary.id },
+            { id: 'goal_demo_trip', name: 'Japan Trip', target: 180000, current: 52000, deadline: iso(240), accountId: accSpending.id }
+        ],
+        categoryBudgets: {
+            Rent: 18000,
+            Groceries: 8000,
+            Utilities: 4000,
+            Transport: 5000,
+            Entertainment: 4000
+        },
+        theme: document.body.classList.contains('dark') ? 'dark' : 'light',
+        lastReset: null,
+        recurring: [],
+        investments: [
+            { id: 'inv_demo_1', ticker: 'NIFTYBEES', qty: 20, buyPrice: 230, currentPrice: 248, accountId: accSalary.id },
+            { id: 'inv_demo_2', ticker: 'GOLD ETF', qty: 6, buyPrice: 5800, currentPrice: 6125, accountId: accSalary.id }
+        ],
+        subscriptions: [
+            { id: 'sub_demo_1', name: 'Netflix', amount: 649, dueDate: 8, accountId: accSpending.id },
+            { id: 'sub_demo_2', name: 'Spotify', amount: 119, dueDate: 12, accountId: accSpending.id }
+        ],
+        accounts: [accSalary, accSpending, accLoan],
+        customAssets: [
+            { id: 'asset_demo_1', type: 'movable', category: 'Vehicle', name: 'Honda City', value: 650000 },
+            { id: 'asset_demo_2', type: 'immovable', category: 'Real Estate', name: 'Apartment Share', value: 1800000 }
+        ],
+        customLoans: [
+            {
+                id: 'loan_demo_1',
+                type: 'bank',
+                bankName: 'ICICI',
+                accountNo: '7301',
+                purpose: 'Home Loan',
+                principal: 1200000,
+                rate: 8.4,
+                years: 15,
+                finalAmount: 980000,
+                accountId: accLoan.id
+            }
+        ]
+    });
+}
+
+function exportAllData() {
+    const snapshot = {
+        exportedAt: new Date().toISOString(),
+        app: 'FinancePro',
+        version: 1,
+        state
+    };
+
+    const file = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file);
+    a.download = `financepro_full_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+}
+
+function importAllData() {
+    const useSampleData = confirm('Click OK to load Sample Data for all sections.\nClick Cancel to import your own JSON backup file.');
+
+    if (useSampleData) {
+        const replace = confirm('This will replace current data with sample data. Continue?');
+        if (!replace) return;
+
+        state = createSampleState();
+        refreshAfterDataImport();
+        alert('Sample data loaded successfully across all sections.');
+        return;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+
+    input.onchange = (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (loadEvent) => {
+            try {
+                const raw = JSON.parse(loadEvent.target.result);
+                const importedPayload = raw && raw.state ? raw.state : raw;
+                if (!importedPayload || typeof importedPayload !== 'object') {
+                    throw new Error('Invalid backup format');
+                }
+
+                state = normalizeImportedState(importedPayload);
+                refreshAfterDataImport();
+
+                alert('Full data imported successfully. All sections were updated.');
+            } catch (error) {
+                console.error('Full data import failed', error);
+                alert('Import failed. Please choose a valid FinancePro JSON backup file.');
+            }
+        };
+
+        reader.readAsText(file);
+    };
+
+    input.click();
+}
+
 function exportCSV() {
     const transactions = getTransactions(); if (transactions.length === 0) return alert("No transactions to export.");
     const csv = [['Date', 'Category', 'Amount', 'Type', 'Notes'], ...transactions.map(t => [new Date(t.date).toLocaleDateString('en-IN'), t.category, t.amount, t.type, t.notes])].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');

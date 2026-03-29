@@ -90,6 +90,8 @@ function executeTransfer() {
     const accFrom = state.accounts.find(a => a.id === fromId);
     const accTo = state.accounts.find(a => a.id === toId);
 
+    if (!accFrom || !accTo) return alert("One or both selected accounts no longer exist. Please refresh account selections.");
+
     if (accFrom.balance < amount && accFrom.type !== 'Loan' && !confirm("Overdraw account?")) return;
 
     accFrom.balance -= amount;
@@ -879,6 +881,7 @@ function saveNewGoal() {
 function renderGoals() {
     const container = document.getElementById('goalsList'); if (!container) return;
     container.innerHTML = (state.goals || []).map(goal => {
+        const goalId = String(goal.id);
         const progress = goal.target > 0 ? (goal.current / goal.target) * 100 : 0;
         const daysLeft = goal.deadline ? Math.max(0, Math.ceil((new Date(goal.deadline) - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
@@ -899,31 +902,32 @@ function renderGoals() {
                 ${goal.deadline ? `<small class="goal-timeline" style="color: var(--text-muted);">${daysLeft === 0 ? 'Today!' : `${daysLeft} days left`}</small>` : ''}
             </div>
             <div style="margin-top: 15px; display: flex; gap: 8px;">
-                <button onclick="editGoal(${goal.id})" class="btn-sm" style="background:#10b981; padding: 6px 12px; color: white; border-radius: 6px;">Add Funds</button>
-                <button onclick="deleteGoal(${goal.id})" class="btn-sm btn-delete" style="background: #ef4444; padding: 6px 12px; color: white; border-radius: 6px;">Delete</button>
+                <button onclick="editGoal('${goalId}')" class="btn-sm" style="background:#10b981; padding: 6px 12px; color: white; border-radius: 6px;">Add Funds</button>
+                <button onclick="deleteGoal('${goalId}')" class="btn-sm btn-delete" style="background: #ef4444; padding: 6px 12px; color: white; border-radius: 6px;">Delete</button>
             </div>
         </div>`;
     }).join('') || '<p class="empty-state">No goals set. Add your first savings goal!</p>';
 }
 
 function editGoal(id) {
-    const goal = state.goals.find(g => g.id === id); if (!goal) return;
+    const normalizedId = String(id);
+    const goal = state.goals.find(g => String(g.id) === normalizedId); if (!goal) return;
     updateAccountDropdowns();
-    document.getElementById('fundGoalId').value = id;
+    document.getElementById('fundGoalId').value = normalizedId;
     document.getElementById('fundGoalTitle').innerText = `Fund: ${goal.name}`;
     document.getElementById('fundAmount').value = '';
     document.getElementById('fundGoalModal').style.display = 'block';
 }
 
 function executeGoalFunding() {
-    const goalId = Number(document.getElementById('fundGoalId').value);
+    const goalId = String(document.getElementById('fundGoalId').value);
     const sourceAccountId = document.getElementById('fundSourceAccount').value;
     const amount = Number(document.getElementById('fundAmount').value);
 
     if (!sourceAccountId) return alert('❌ Please select a source bank account to transfer from.');
     if (amount <= 0 || isNaN(amount)) return alert('Amount must be positive.');
 
-    const goal = state.goals.find(g => g.id === goalId);
+    const goal = state.goals.find(g => String(g.id) === goalId);
     if (!goal || !goal.accountId) return alert('Goal is corrupted or missing a target account.');
 
     if (sourceAccountId === goal.accountId) {
@@ -932,6 +936,10 @@ function executeGoalFunding() {
 
     const sourceAcc = state.accounts.find(a => a.id === sourceAccountId);
     const targetAcc = state.accounts.find(a => a.id === goal.accountId);
+
+    if (!sourceAcc || !targetAcc) {
+        return alert('Source or goal account no longer exists. Please update account links and try again.');
+    }
 
     if (sourceAcc.balance < amount && sourceAcc.type !== 'Loan' && !confirm("Overdraw source account?")) return;
 
@@ -955,7 +963,13 @@ function executeGoalFunding() {
     closeFundGoalModal(); saveState(); renderAll(); syncDashboard();
 }
 
-function deleteGoal(id) { if (!confirm("Delete this goal?")) return; state.goals = state.goals.filter(g => g.id !== id); saveState(); renderGoals(); }
+function deleteGoal(id) {
+    if (!confirm("Delete this goal?")) return;
+    const normalizedId = String(id);
+    state.goals = state.goals.filter(g => String(g.id) !== normalizedId);
+    saveState();
+    renderGoals();
+}
 
 // Subscriptions
 function showSubscriptionModal() { updateAccountDropdowns(); document.getElementById('subscriptionModal').style.display = 'block'; }

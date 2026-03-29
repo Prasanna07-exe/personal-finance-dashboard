@@ -1,3 +1,49 @@
+const SPLINE_SCENES = {
+    dark: 'https://prod.spline.design/vnLh5ZNRjBQEz9V4/scene.splinecode',
+    light: 'https://prod.spline.design/eCOXc8L2lS9PB6Dc/scene.splinecode'
+};
+
+function markSplineLoading(isLoading) {
+    const splineWrapper = document.getElementById('spline-wrapper');
+    if (!splineWrapper) return;
+
+    splineWrapper.classList.toggle('is-loading', isLoading);
+    splineWrapper.classList.toggle('is-ready', !isLoading);
+    splineWrapper.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+}
+
+function mountSplineScene(targetUrl) {
+    const splineWrapper = document.getElementById('spline-wrapper');
+    if (!splineWrapper || !targetUrl) return;
+
+    const existingViewer = splineWrapper.querySelector('spline-viewer');
+    if (existingViewer && existingViewer.getAttribute('url') === targetUrl && splineWrapper.classList.contains('is-ready')) {
+        return;
+    }
+
+    markSplineLoading(true);
+    if (existingViewer) existingViewer.remove();
+
+    const viewer = document.createElement('spline-viewer');
+    viewer.setAttribute('url', targetUrl);
+    viewer.setAttribute('loading-anim-type', 'none');
+
+    let readyHandled = false;
+    const onSceneReady = () => {
+        if (readyHandled) return;
+        readyHandled = true;
+        clearTimeout(readyFallback);
+        markSplineLoading(false);
+    };
+
+    // Fallback: never leave the page blank if the custom element delays events.
+    const readyFallback = setTimeout(onSceneReady, 12000);
+
+    viewer.addEventListener('load', onSceneReady, { once: true });
+    viewer.addEventListener('ready', onSceneReady, { once: true });
+    splineWrapper.prepend(viewer);
+}
+
 function switchView(viewId) {
     document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
 
@@ -55,15 +101,8 @@ function applyTheme() {
     const btn = document.getElementById('themeToggleBtn');
     if (btn) btn.innerText = isDark ? '☀️' : '🌙';
 
-    // THE NUCLEAR SPLINE SWAP: Overwrite the innerHTML completely
-    const splineWrapper = document.getElementById('spline-wrapper');
-    if (splineWrapper) {
-        const targetUrl = isDark
-            ? 'https://prod.spline.design/vnLh5ZNRjBQEz9V4/scene.splinecode'  // Dark Model
-            : 'https://prod.spline.design/eCOXc8L2lS9PB6Dc/scene.splinecode'; // Light Model
-
-        splineWrapper.innerHTML = `<spline-viewer url="${targetUrl}"></spline-viewer>`;
-    }
+    const targetUrl = isDark ? SPLINE_SCENES.dark : SPLINE_SCENES.light;
+    mountSplineScene(targetUrl);
 
     // Update Charts
     if (typeof updateChartTheme === 'function') updateChartTheme(isDark);

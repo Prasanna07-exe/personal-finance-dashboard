@@ -33,6 +33,7 @@
                 <div class="header-right-actions" style="display: flex; align-items: center; gap: 12px;">
 
                     <div class="toggle-section" id="navMenu">
+                        <button onclick="importAllData(); closeMenu();" style="background:transparent; border:1px solid var(--glass-border);">📥 Import Data</button>
                         <button onclick="downloadReport(); closeMenu();">Get Report</button>
                         <button onclick="showQuickTools(); closeMenu();">Tools</button>
                         <button onclick="showUserManual(); closeMenu();">Help</button>
@@ -43,6 +44,7 @@
 
                         <div class="mobile-only-nav">
                             <p class="nav-label">Navigation</p>
+                            <button class="nav-btn" onclick="importAllData(); closeMenu();">📥 Import Full Data</button>
                             <button class="nav-btn" onclick="switchView('home-hub'); closeMenu();">🌌 3D Hub</button>
                             <button class="nav-btn" onclick="switchView('overview'); closeMenu();">📊 Dashboard
                                 Stats</button>
@@ -70,9 +72,11 @@
             </header>
             <div id="home-hub" class="view active">
                 <div class="hero-3d-container">
-                    <div id="spline-wrapper" style="position: absolute; width: 100%; height: 100%; z-index: 1;">
-                        <spline-viewer
-                            url="https://prod.spline.design/vnLh5ZNRjBQEz9V4/scene.splinecode"></spline-viewer>
+                    <div id="spline-wrapper" class="is-loading" style="position: absolute; width: 100%; height: 100%; z-index: 1;" aria-busy="true">
+                        <div id="spline-loader" class="spline-loader-overlay" aria-live="polite">
+                            <div class="loader loader--glisteningWindow" aria-hidden="true"></div>
+                            <p class="spline-loader-text">Loading 3D Hub...</p>
+                        </div>
                     </div>
 
                     <div class="node-orbit pos-1" onclick="switchView('overview')">
@@ -99,9 +103,6 @@
                     <div class="node-orbit pos-8" onclick="switchView('accounts-view')">
                         <span>Bank Accounts</span>
                     </div>
-                    <button class="mobile-quick-add" onclick="showAddTransactionModal()">
-                         Quick Add Transaction
-                    </button>
                 </div>
             </div>
             <div id="accounts-view" class="view">
