@@ -1,4 +1,4 @@
-let expenseChart, summaryChart, forecastChart, budgetChart, networthChart, weekdayChart;
+let expenseChart, summaryChart, forecastChart, budgetChart, networthChart;
 
 function initializeCharts() {
     Chart.defaults.color = 'rgba(148, 163, 184, 0.8)';
@@ -45,30 +45,6 @@ function initializeCharts() {
         });
     }
 
-    const ctxWeekday = document.getElementById('weekdayChart');
-    if (ctxWeekday) {
-        weekdayChart = new Chart(ctxWeekday, {
-            type: 'bar',
-            data: {
-                labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-                datasets: [{
-                    label: 'Expense',
-                    data: [0, 0, 0, 0, 0, 0, 0],
-                    backgroundColor: '#f97316',
-                    borderRadius: 6,
-                    barPercentage: 0.5,
-                    categoryPercentage: 0.6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-    }
-
     const ctxBudget = document.getElementById('budgetChart');
     if (ctxBudget) {
         budgetChart = new Chart(ctxBudget, {
@@ -110,13 +86,6 @@ function updateBudgetChart() {
     const within = state.budget > 0 ? Math.max(0, state.budget - exp) : 100;
     const over = Math.max(0, exp - state.budget);
     budgetChart.data.datasets[0].data = [within, over]; budgetChart.update('none');
-}
-
-function updateWeekdayChart() {
-    if (!weekdayChart) return;
-    const totals = typeof getExpensesByWeekday === 'function' ? getExpensesByWeekday() : [0,0,0,0,0,0,0];
-    weekdayChart.data.datasets[0].data = totals;
-    weekdayChart.update('none');
 }
 
 function updateNetWorthChart() {
