@@ -3,6 +3,10 @@ const SPLINE_SCENES = {
     light: 'https://prod.spline.design/eCOXc8L2lS9PB6Dc/scene.splinecode'
 };
 
+const SPLINE_LOADER_SHOW_DELAY_MS = 180;
+const SPLINE_RENDER_FALLBACK_MS = 1400;
+const SPLINE_READY_FALLBACK_MS = 3200;
+
 let splineLoaderDelayHandle = null;
 let currentViewId = 'home-hub';
 const viewHistoryStack = [];
@@ -30,7 +34,7 @@ function markSplineLoading(isLoading) {
         // Only show loader if loading takes noticeable time (avoids flicker on cached reloads).
         splineLoaderDelayHandle = setTimeout(() => {
             loader.classList.add('is-visible');
-        }, 320);
+        }, SPLINE_LOADER_SHOW_DELAY_MS);
     } else if (!isLoading) {
         sessionStorage.setItem('financeproSplineLoaded', '1');
     }
@@ -57,12 +61,16 @@ function mountSplineScene(targetUrl) {
     const onSceneReady = () => {
         if (readyHandled) return;
         readyHandled = true;
+        clearTimeout(renderFallback);
         clearTimeout(readyFallback);
         markSplineLoading(false);
     };
 
-    // Fallback: never leave the page blank if the custom element delays events.
-    const readyFallback = setTimeout(onSceneReady, 12000);
+    // Faster fallback: if events lag but viewer is already in DOM, hide loader quickly.
+    const renderFallback = setTimeout(onSceneReady, SPLINE_RENDER_FALLBACK_MS);
+
+    // Hard fallback: never keep the loader stuck for long if custom events fail.
+    const readyFallback = setTimeout(onSceneReady, SPLINE_READY_FALLBACK_MS);
 
     viewer.addEventListener('load', onSceneReady, { once: true });
     viewer.addEventListener('ready', onSceneReady, { once: true });
