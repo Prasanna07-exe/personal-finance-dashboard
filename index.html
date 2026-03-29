@@ -194,12 +194,10 @@
                             <select id="filterCategory">
                                 <option value="">All Categories</option>
                             </select>
-                            <div class="transaction-actions">
-                                <button onclick="exportCSV()">📤 Export</button>
-                                <button onclick="importCSV()" class="secondary"
-                                    style="background:transparent; border:1px solid var(--glass-border);">📥 Import</button>
-                                <button onclick="showAddTransactionModal()">➕ New</button>
-                            </div>
+                            <button onclick="exportCSV()">📤 Export</button>
+                            <button onclick="importCSV()" class="secondary"
+                                style="background:transparent; border:1px solid var(--glass-border);">📥 Import</button>
+                            <button onclick="showAddTransactionModal()">➕ New</button>
                         </div>
                     </div>
                     <div class="table-container">
@@ -220,7 +218,6 @@
                     <div class="table-footer">
                         <button onclick="monthlyReset()">Clear > 30 Days</button>
                         <span id="transactionCount">0 transactions</span>
-                        <span id="noSpendStreakBadge" class="no-spend-badge">No-spend streak: 0 days</span>
                     </div>
                 </section>
             </div>
@@ -246,11 +243,6 @@
                         <p id="savingsGoalText" style="text-align: center; color: var(--text-muted);">Add income to
                             track your goal progress.</p>
                     </div>
-                    <div class="analytics-card streak-card">
-                        <h3>No-Spend Streak</h3>
-                        <p id="noSpendStreakValue" style="font-size: 1.8rem; font-weight: 700; margin-bottom: 4px;">0 days</p>
-                        <p id="noSpendStreakLabel" style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">Start logging expenses to track your no-spend streak.</p>
-                    </div>
                 </section>
 
                 <section class="charts">
@@ -265,10 +257,6 @@
                     <div class="chart-box" style="grid-column: span 2;">
                         <h3>Cashflow Forecast</h3>
                         <div class="chart-wrapper"><canvas id="forecastChart"></canvas></div>
-                    </div>
-                    <div class="chart-box">
-                        <h3>Spending by Weekday</h3>
-                        <div class="chart-wrapper"><canvas id="weekdayChart"></canvas></div>
                     </div>
                 </section>
             </div>
@@ -492,7 +480,7 @@
                     <option value="">Select Account</option>
                 </select>
                 <select id="transactionCategory"></select>
-                <input type="number" id="transactionAmount" placeholder="Amount (e.g., 500)" min="0" inputmode="decimal">
+                <input type="number" id="transactionAmount" placeholder="Amount (e.g., 500)">
                 <input type="text" id="transactionNotes" placeholder="Notes (optional)">
                 <div class="modal-buttons"><button onclick="saveTransaction()">Save</button></div>
             </div>
@@ -516,7 +504,7 @@
                     <option value="Individual">Individual</option>
                     <option value="Joint">Joint Account</option>
                 </select>
-                <input type="number" id="accInitialBalance" placeholder="Current Balance (₹)" inputmode="decimal">
+                <input type="number" id="accInitialBalance" placeholder="Current Balance (₹)">
                 <div class="modal-buttons"><button onclick="saveAccount()">Save Account</button></div>
             </div>
         </div>
@@ -529,7 +517,7 @@
             <div class="modal-form">
                 <label>From Account:</label><select id="transferFrom"></select>
                 <label>To Account:</label><select id="transferTo"></select>
-                <input type="number" id="transferAmount" placeholder="Amount to Transfer" min="0" inputmode="decimal">
+                <input type="number" id="transferAmount" placeholder="Amount to Transfer">
                 <input type="text" id="transferNotes" placeholder="Notes (optional)">
                 <div class="modal-buttons"><button onclick="executeTransfer()">Transfer</button></div>
             </div>
@@ -566,7 +554,7 @@
             <h3>Create Savings Goal</h3>
             <div class="modal-form">
                 <input type="text" id="goalName" placeholder="Goal Name (e.g., Vacation)">
-                <input type="number" id="goalTarget" placeholder="Target Amount (₹)" min="0" inputmode="decimal">
+                <input type="number" id="goalTarget" placeholder="Target Amount (₹)">
                 <label style="font-size: 0.9rem; color: var(--text-muted);">Where will this money be stored?</label>
                 <select class="account-dropdown" id="goalAccount"></select>
                 <input type="date" id="goalDeadline" title="Target Deadline">
@@ -583,7 +571,7 @@
                 <input type="hidden" id="fundGoalId">
                 <label style="font-size: 0.9rem; color: var(--text-muted);">Transfer money FROM:</label>
                 <select class="account-dropdown" id="fundSourceAccount"></select>
-                <input type="number" id="fundAmount" placeholder="Amount to Add (₹)" min="0" inputmode="decimal">
+                <input type="number" id="fundAmount" placeholder="Amount to Add (₹)">
                 <div class="modal-buttons"><button onclick="executeGoalFunding()">Transfer Funds</button></div>
             </div>
         </div>
@@ -595,8 +583,8 @@
             <h3>Purchase Asset</h3>
             <div class="modal-form">
                 <input type="text" id="invTicker" placeholder="Asset Name (e.g., NIFTY50, Gold)">
-                <input type="number" id="invQty" placeholder="Quantity" min="0" inputmode="decimal">
-                <input type="number" id="invPrice" placeholder="Buy Price Per Unit (₹)" min="0" inputmode="decimal">
+                <input type="number" id="invQty" placeholder="Quantity">
+                <input type="number" id="invPrice" placeholder="Buy Price Per Unit (₹)">
                 <label style="font-size: 0.9rem; color: var(--text-muted);">Pay from Bank Account:</label>
                 <select class="account-dropdown" id="invAccount"></select>
                 <div class="modal-buttons"><button onclick="saveInvestment()">Buy Asset</button></div>
@@ -612,7 +600,7 @@
                 <input type="hidden" id="sellInvId">
                 <p id="sellInvDetails" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px;"></p>
                 <p id="sellInvBank" style="color: #3b82f6; font-size: 0.85rem; margin-bottom: 15px;"></p>
-                <input type="number" id="sellPrice" placeholder="Selling Price Per Unit (₹)" min="0" inputmode="decimal">
+                <input type="number" id="sellPrice" placeholder="Selling Price Per Unit (₹)">
                 <div class="modal-buttons"><button onclick="executeSellInvestment()">Execute Trade</button></div>
             </div>
         </div>
@@ -624,7 +612,7 @@
             <h3>Add Subscription</h3>
             <div class="modal-form">
                 <input type="text" id="subName" placeholder="Name (e.g., Netflix, Gym)">
-                <input type="number" id="subAmount" placeholder="Monthly Cost (₹)" min="0" inputmode="decimal">
+                <input type="number" id="subAmount" placeholder="Monthly Cost (₹)">
                 <input type="number" id="subDay" placeholder="Billing Day (1-31)" min="1" max="31">
                 <label style="font-size: 0.9rem; color: var(--text-muted);">Linked Bank Account:</label>
                 <select class="account-dropdown" id="subAccount"></select>
@@ -643,7 +631,7 @@
                     style="color: #ef4444; font-size: 0.95rem; font-weight: bold; margin-bottom: 15px;"></p>
                 <label style="font-size: 0.9rem; color: var(--text-muted);">Transfer money FROM:</label>
                 <select class="account-dropdown" id="repaySourceAccount"></select>
-                <input type="number" id="repayAmount" placeholder="Amount to Repay (₹)" min="0" inputmode="decimal">
+                <input type="number" id="repayAmount" placeholder="Amount to Repay (₹)">
                 <div class="modal-buttons"><button onclick="executeLoanRepayment()" style="background: #3b82f6;">Make
                         Repayment</button></div>
             </div>
@@ -662,7 +650,7 @@
                 <label style="font-size: 0.9rem; color: var(--text-muted);">Deposit money TO:</label>
                 <select class="account-dropdown" id="sellCustomAccount"></select>
 
-                <input type="number" id="sellCustomPrice" placeholder="Final Selling Price (₹)" min="0" inputmode="decimal">
+                <input type="number" id="sellCustomPrice" placeholder="Final Selling Price (₹)">
 
                 <div class="modal-buttons" style="display: flex; flex-direction: column; gap: 10px;">
                     <button onclick="executeSellCustomAsset()" style="background: #10b981;">Confirm Sale</button>
@@ -684,7 +672,7 @@
                     style="color: #f97316; font-size: 0.95rem; font-weight: bold; margin-bottom: 15px;"></p>
                 <label style="font-size: 0.9rem; color: var(--text-muted);">Pay from Bank Account:</label>
                 <select class="account-dropdown" id="repayOtherSourceAccount"></select>
-                <input type="number" id="repayOtherAmount" placeholder="Amount to Repay (₹)" min="0" inputmode="decimal">
+                <input type="number" id="repayOtherAmount" placeholder="Amount to Repay (₹)">
                 <div class="modal-buttons"><button onclick="executeOtherLoanRepayment()"
                         style="background: #f97316;">Make Repayment</button></div>
             </div>
