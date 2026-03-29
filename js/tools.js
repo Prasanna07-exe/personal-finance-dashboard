@@ -32,38 +32,11 @@ function importCSV() {
         const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            const rows = e.target.result.split(/\r?\n/).slice(1);
-            let imported = 0; let skipped = 0;
-
-            rows.forEach((line, index) => {
-                if (!line.trim()) { skipped++; return; }
-                const cells = line.split(',').map(cell => cell.replace(/"/g, '').trim());
-                if (cells.length < 4) { skipped++; return; }
-
-                let [dateStr, category, amountStr, type, ...notes] = cells;
-                if (!category) { skipped++; return; }
-
-                const amount = Number(amountStr);
-                if (!amountStr || isNaN(amount) || amount <= 0) { skipped++; return; }
-
-                const normalizedType = (type || '').toLowerCase();
-                const txnType = normalizedType === 'income' ? 'income' : normalizedType === 'expense' ? 'expense' : null;
-                if (!txnType) { skipped++; return; }
-
-                let date = new Date(dateStr);
-                if (isNaN(date)) date = new Date();
-                const isoDate = date.toISOString().split('T')[0];
-
-                try {
-                    addTransaction(txnType, amount, category, isoDate, notes.join(','));
-                    imported++;
-                } catch (err) {
-                    console.error('Failed to import row', index + 2, err); // +2 for header + 1-based index
-                    skipped++;
-                }
+            e.target.result.split('\n').slice(1).forEach(line => {
+                if (!line.trim()) return;
+                const [date, category, amount, type, ...notes] = line.split(',').map(cell => cell.replace(/"/g, ''));
+                if (amount && category) addTransaction(type.toLowerCase() === 'income' ? 'income' : 'expense', Number(amount), category, new Date().toISOString().split('T')[0], notes.join(','));
             });
-
-            alert(`CSV import complete. Imported: ${imported} row(s). Skipped: ${skipped} row(s).`);
         };
         reader.readAsText(file);
     };
