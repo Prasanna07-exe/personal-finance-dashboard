@@ -73,6 +73,53 @@ body.dark::before {
     max-width: 100%;
 }
 
+.site-footer {
+    margin: 18px 0 0;
+    padding: 14px 20px;
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(248, 250, 252, 0.82);
+    color: #475569;
+    font-size: 0.84rem;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.site-footer a {
+    color: #1d4ed8;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.site-footer a:hover {
+    text-decoration: underline;
+}
+
+body.dark .site-footer {
+    border-top-color: #1e293b;
+    background: #020617;
+    color: #94a3b8;
+}
+
+body.dark .site-footer a {
+    color: #60a5fa;
+}
+
+@media (max-width: 720px) {
+    .site-footer {
+        margin-top: 14px;
+        font-size: 0.8rem;
+        line-height: 1.45;
+    }
+}
+
+/* Hide footer for installed PWA experience */
+@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+    .site-footer {
+        display: none !important;
+    }
+}
+
 .view {
     display: none;
     animation: fadeInUp 0.4s ease both;

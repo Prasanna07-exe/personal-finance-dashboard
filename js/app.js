@@ -1,7 +1,7 @@
 function initializeApp() {
     populateDropdowns();
     loadState();
-    initializeCharts();
+    initializeChartsLazy();
 
     const budgetInput = document.getElementById('budgetInput');
     if (budgetInput) budgetInput.value = state.budget || '';
@@ -9,8 +9,31 @@ function initializeApp() {
     applyTheme();
     renderAll();
 
-    if (typeof registerPWA === 'function') registerPWA();
+    registerPWA();
     detectSpendingAnomalies();
+}
+
+function initializeChartsLazy() {
+    const bootCharts = () => {
+        if (typeof initializeCharts !== 'function') return;
+        if (!window.Chart || window.__chartsBooted) return;
+        window.__chartsBooted = true;
+        initializeCharts();
+        renderAll();
+    };
+
+    if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(bootCharts, { timeout: 1400 });
+    } else {
+        setTimeout(bootCharts, 350);
+    }
+
+    // Ensure charts become available quickly when user switches to data-heavy views.
+    document.addEventListener('click', (event) => {
+        const btn = event.target.closest('[onclick*="switchView"]');
+        if (!btn) return;
+        bootCharts();
+    }, { passive: true });
 }
 
 function populateDropdowns() {
@@ -60,26 +83,74 @@ function updateInsights(income, savings) {
 
 function updateBudgetWarning(totalExpense) {
     const el = document.getElementById('budgetWarning'); if (!el) return;
-    if (state.budget <= 0) return el.innerText = 'Set a monthly budget to unlock tracking.';
-    if (totalExpense > state.budget) { el.innerText = `⚠️ Over budget by ₹${(totalExpense - state.budget).toLocaleString()}`; el.style.color = 'var(--danger)'; }
-    else { el.innerText = `Remaining: ₹${(state.budget - totalExpense).toLocaleString()}`; el.style.color = 'var(--text-muted)'; }
+    if (state.budget <= 0) {
+        if (state.income > 0) {
+            const spendRatio = (totalExpense / state.income) * 100;
+            el.innerText = `Budget not set. Current spend ratio: ${spendRatio.toFixed(1)}% of income.`;
+        } else {
+            el.innerText = 'Set a monthly budget to unlock tracking.';
+        }
+        el.style.color = 'var(--text-muted)';
+        return;
+    }
+
+    const utilization = (totalExpense / state.budget) * 100;
+    if (utilization > 100) {
+        el.innerText = `⚠️ Over budget by ₹${(totalExpense - state.budget).toLocaleString()} (${utilization.toFixed(1)}% used)`;
+        el.style.color = 'var(--danger)';
+    } else if (utilization >= 85) {
+        el.innerText = `⚠️ Near budget limit: ${utilization.toFixed(1)}% used`;
+        el.style.color = 'var(--warning)';
+    } else {
+        el.innerText = `Healthy budget usage: ${utilization.toFixed(1)}% used`;
+        el.style.color = 'var(--success)';
+    }
 }
 
 function updateSavingsGoal(income, savings) {
     const fill = document.getElementById('savingsGoalProgress'); const text = document.getElementById('savingsGoalText'); if (!fill || !text) return;
     if (income <= 0) { fill.style.width = '0%'; text.innerText = 'Pending income data...'; return; }
-    const ratio = (savings / income) * 100; const progress = Math.max(0, Math.min(100, (ratio / SAVINGS_GOAL_RATIO) * 100));
-    fill.style.width = `${progress}%`; text.innerText = `Status: ${progress.toFixed(0)}% to target (${ratio.toFixed(1)}% saved).`;
+    const ratio = (savings / income) * 100;
+    const progress = Math.max(0, (ratio / SAVINGS_GOAL_RATIO) * 100);
+    const visualProgress = Math.min(progress, 100);
+
+    fill.style.width = `${visualProgress}%`;
+    if (progress >= 100) {
+        text.innerText = `Status: ${progress.toFixed(1)}% of target achieved (${ratio.toFixed(1)}% saved).`;
+    } else {
+        text.innerText = `Status: ${progress.toFixed(1)}% to target (${ratio.toFixed(1)}% saved).`;
+    }
 }
 
 function updateFinancialHealthScore(income, totalExpense, savings) {
     const valEl = document.getElementById('healthScoreValue'); const ringEl = document.getElementById('healthRing'); const labelEl = document.getElementById('healthScoreLabel');
     if (!valEl || !ringEl || !labelEl) return;
-    if (income <= 0) return valEl.innerText = '0';
+    if (income <= 0) {
+        valEl.innerText = '0';
+        ringEl.style.setProperty('--score-angle', '0deg');
+        labelEl.innerText = 'Add income data to calculate health score.';
+        return;
+    }
+
+    const savingsRatio = savings / income; // negative to positive
+    const budgetAdherence = state.budget > 0
+        ? 1 - (Math.max(0, totalExpense - state.budget) / state.budget)
+        : 1 - (totalExpense / Math.max(income, 1));
+    const spendingPressure = totalExpense / income;
+
     let score = 50;
-    if (savings > 0) score += 20; if (state.budget > 0 && totalExpense <= state.budget) score += 30; if (savings < 0) score -= 40;
-    score = Math.max(0, Math.min(100, score)); valEl.innerText = score; ringEl.style.setProperty('--score-angle', `${(score / 100) * 360}deg`);
-    labelEl.innerText = score > 75 ? 'Excellent financial health.' : score > 40 ? 'Stable, but needs optimization.' : 'Urgent attention required.';
+    score += Math.max(-1, Math.min(1, savingsRatio)) * 35;
+    score += Math.max(0, Math.min(1, budgetAdherence)) * 25;
+    score += (1 - Math.min(1.5, spendingPressure)) * 20;
+
+    score = Math.round(Math.max(0, Math.min(100, score)));
+    valEl.innerText = score;
+    ringEl.style.setProperty('--score-angle', `${(score / 100) * 360}deg`);
+
+    if (score >= 80) labelEl.innerText = 'Excellent financial health.';
+    else if (score >= 60) labelEl.innerText = 'Good progress, keep consistency.';
+    else if (score >= 40) labelEl.innerText = 'Moderate health, optimize spending.';
+    else labelEl.innerText = 'High risk zone, corrective action needed.';
 }
 
 function renderExpenseBreakdown() {
@@ -105,12 +176,12 @@ function monthlyReset() {
 }
 
 function registerPWA() {
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            const swUrl = URL.createObjectURL(new Blob([`self.addEventListener('install', (e) => { e.waitUntil(caches.open('finance-v1').then((cache) => cache.addAll(['/']))); }); self.addEventListener('fetch', (e) => { e.respondWith(caches.match(e.request).then((response) => response || fetch(e.request))); });`], { type: 'application/javascript' }));
-            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW failed: ', err));
-        });
-    }
+    if (!('serviceWorker' in navigator)) return;
+
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+            .catch((err) => console.log('SW registration failed:', err));
+    });
 }
 
 // Boot Sequence

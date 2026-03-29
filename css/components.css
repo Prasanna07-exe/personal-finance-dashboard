@@ -25,6 +25,15 @@
     letter-spacing: -0.015em;
 }
 
+.brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 8px 20px rgba(29, 78, 216, 0.25);
+}
+
+
 .title-section p {
     margin-top: 6px;
     font-size: 0.96rem;
@@ -164,7 +173,17 @@ select:focus {
     background: radial-gradient(circle at center, rgba(239, 246, 255, 0.78) 0%, rgba(224, 242, 254, 0.62) 68%);
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
-    transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+#spline-wrapper.is-loading .spline-loader-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
 }
 
 #spline-wrapper.is-ready .spline-loader-overlay {

@@ -3,13 +3,37 @@ const SPLINE_SCENES = {
     light: 'https://prod.spline.design/eCOXc8L2lS9PB6Dc/scene.splinecode'
 };
 
+let splineLoaderDelayHandle = null;
+let currentViewId = 'home-hub';
+const viewHistoryStack = [];
+
 function markSplineLoading(isLoading) {
     const splineWrapper = document.getElementById('spline-wrapper');
     if (!splineWrapper) return;
 
+    const loader = document.getElementById('spline-loader');
+
     splineWrapper.classList.toggle('is-loading', isLoading);
     splineWrapper.classList.toggle('is-ready', !isLoading);
     splineWrapper.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+
+    if (splineLoaderDelayHandle) {
+        clearTimeout(splineLoaderDelayHandle);
+        splineLoaderDelayHandle = null;
+    }
+
+    if (loader) {
+        loader.classList.remove('is-visible');
+    }
+
+    if (isLoading && loader) {
+        // Only show loader if loading takes noticeable time (avoids flicker on cached reloads).
+        splineLoaderDelayHandle = setTimeout(() => {
+            loader.classList.add('is-visible');
+        }, 320);
+    } else if (!isLoading) {
+        sessionStorage.setItem('financeproSplineLoaded', '1');
+    }
 }
 
 function mountSplineScene(targetUrl) {
@@ -21,7 +45,8 @@ function mountSplineScene(targetUrl) {
         return;
     }
 
-    markSplineLoading(true);
+    const seenInSession = sessionStorage.getItem('financeproSplineLoaded') === '1';
+    markSplineLoading(!seenInSession);
     if (existingViewer) existingViewer.remove();
 
     const viewer = document.createElement('spline-viewer');
@@ -45,6 +70,12 @@ function mountSplineScene(targetUrl) {
 }
 
 function switchView(viewId) {
+    if (!viewId || viewId === currentViewId) return;
+
+    if (currentViewId) {
+        viewHistoryStack.push(currentViewId);
+    }
+
     document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
 
     const targetView = document.getElementById(viewId);
@@ -75,12 +106,64 @@ function switchView(viewId) {
         }
     }
 
+    currentViewId = viewId;
+
     setTimeout(() => {
+        if (!window.Chart || !Chart.instances) return;
         Object.values(Chart.instances).forEach(chart => {
             chart.resize();
             chart.update();
         });
     }, 10);
+}
+
+function switchViewWithoutHistory(viewId) {
+    if (!viewId) return;
+
+    document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+    const targetView = document.getElementById(viewId);
+    if (targetView) targetView.classList.add('active');
+
+    const viewTitles = {
+        'home-hub': 'FinancePro',
+        'overview': 'Dashboard Analytics',
+        'transactions-view': 'Transaction History',
+        'budget-view': 'Budget & Insights',
+        'wealth-view': 'Net Worth Tracker',
+        'goals-view': 'Savings Goals',
+        'investments-view': 'Investment Portfolio',
+        'subscriptions-view': 'Active Subscriptions',
+        'accounts-view': 'Bank Accounts'
+    };
+
+    const titleEl = document.getElementById('viewTitle');
+    const backBtn = document.getElementById('backToHubBtn');
+    if (titleEl) titleEl.innerText = viewTitles[viewId] || 'Dashboard';
+    if (backBtn) backBtn.style.display = viewId === 'home-hub' ? 'none' : 'block';
+
+    currentViewId = viewId;
+
+    setTimeout(() => {
+        if (!window.Chart || !Chart.instances) return;
+        Object.values(Chart.instances).forEach(chart => {
+            chart.resize();
+            chart.update();
+        });
+    }, 10);
+}
+
+function goBackView() {
+    const previous = viewHistoryStack.pop();
+    if (previous) {
+        switchViewWithoutHistory(previous);
+    } else {
+        switchViewWithoutHistory('home-hub');
+    }
+}
+
+function goHomeHub() {
+    switchViewWithoutHistory('home-hub');
+    viewHistoryStack.length = 0;
 }
 
 function toggleTheme() {

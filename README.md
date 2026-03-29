@@ -142,6 +142,18 @@ This repository follows academic and ethical sharing expectations. External reso
 - Card tilt effects on hover
 - Ripple button effects
 
+### 12. **PWA Features**
+- Installable app with custom install prompt
+- Offline capability via service worker cache-first strategy
+- App manifest with standalone display mode and branded app icons
+- Favicon + app icon integration for web and mobile launch surfaces
+- Lightweight startup optimizations (deferred scripts, lazy chart initialization)
+
+### UI Inspiration
+- Stripe-style clarity (minimal, data-first layouts)
+- Apple-like polish (smooth transitions, restrained depth, clean spacing)
+- Fintech glassmorphism accents adapted for dashboard readability
+
 ---
 
 ## 🏗️ Project Structure
@@ -409,11 +421,17 @@ For school/portfolio distribution, keep this LICENSE file and attribution sectio
 
 ---
 
-## 👨‍💻 Author
+## 👥 Contributors
 
-**Prasanna07-exe**
-- GitHub: [@Prasanna07-exe](https://github.com/Prasanna07-exe)
-- Project: [Personal Finance Dashboard](https://github.com/Prasanna07-exe/personal-finance-dashboard)
+This project was developed as a team effort.
+
+1. **thebestproha** (Prabanjan)
+    GitHub: [@thebestproha](https://github.com/thebestproha)
+2. **Prasanna07-exe** (Prasanna K)
+    GitHub: [@Prasanna07-exe](https://github.com/Prasanna07-exe)
+3. **nithyashree-18** (Nithyashree A)
+    GitHub: [@nithyashree-18](https://github.com/nithyashree-18)
+
 
 ---
 
@@ -490,10 +508,4 @@ If this project helped you, please:
 
 ---
 
-<div align="center">
-
-**Made with ❤️ by Prasanna07-exe**
-
 [⬆ Back to top](#-financepro---personal-finance-dashboard)
-
-</div>

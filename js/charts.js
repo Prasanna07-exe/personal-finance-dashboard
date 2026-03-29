@@ -1,5 +1,56 @@
 let expenseChart, summaryChart, forecastChart, budgetChart, networthChart;
 
+function drillDownToTransactionsCategory(category) {
+    if (!category) return;
+
+    if (typeof switchView === 'function') switchView('transactions-view');
+
+    // Let view switch settle, then apply transaction filter.
+    setTimeout(() => {
+        const searchBox = document.getElementById('searchTransactions');
+        if (searchBox) searchBox.value = '';
+
+        if (typeof updateFilterCategories === 'function') updateFilterCategories();
+        const categoryFilter = document.getElementById('filterCategory');
+
+        let categoryApplied = false;
+        if (categoryFilter) {
+            const optionExists = Array.from(categoryFilter.options).some((opt) => opt.value === category);
+            if (optionExists) {
+                categoryFilter.value = category;
+                categoryApplied = true;
+            }
+        }
+
+        // Fallback: search by text if exact option match is not ready.
+        if (!categoryApplied && searchBox) {
+            searchBox.value = category;
+        }
+
+        if (typeof renderTransactions === 'function') renderTransactions();
+    }, 30);
+}
+
+function bindExpenseChartDrilldown(chart) {
+    if (!chart || chart.__drilldownBound) return;
+    chart.__drilldownBound = true;
+
+    const canvas = chart.canvas;
+    if (!canvas) return;
+
+    const handlePointer = (event) => {
+        const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: false }, true);
+        if (!points || points.length === 0) return;
+
+        const index = points[0].index;
+        const category = chart?.data?.labels?.[index];
+        drillDownToTransactionsCategory(category);
+    };
+
+    canvas.addEventListener('click', handlePointer);
+    canvas.addEventListener('touchend', handlePointer, { passive: true });
+}
+
 function initializeCharts() {
     Chart.defaults.color = 'rgba(148, 163, 184, 0.8)';
     Chart.defaults.font.family = '"Segoe UI", system-ui, sans-serif';
@@ -31,9 +82,18 @@ function initializeCharts() {
                             }
                         }
                     }
+                },
+                onClick: function (_event, elements, chart) {
+                    if (!elements || elements.length === 0) return;
+
+                    const index = elements[0].index;
+                    const category = chart?.data?.labels?.[index];
+                    drillDownToTransactionsCategory(category);
                 }
             }
         });
+
+        bindExpenseChartDrilldown(expenseChart);
     }
 
     const ctxForecast = document.getElementById('forecastChart');
@@ -49,7 +109,10 @@ function initializeCharts() {
     if (ctxBudget) {
         budgetChart = new Chart(ctxBudget, {
             type: 'doughnut',
-            data: { labels: ['Within Budget', 'Over Budget'], datasets: [{ data: [100, 0], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }] },
+            data: {
+                labels: ['Spent', 'Remaining', 'Over Budget'],
+                datasets: [{ data: [50, 50, 0], backgroundColor: ['#3b82f6', '#22c55e', '#ef4444'], borderWidth: 0 }]
+            },
             options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
         });
     }
@@ -75,17 +138,84 @@ function updateExpenseChart() {
     expenseChart.data.datasets[0].data = Object.values(map); expenseChart.update();
 }
 
+function getRecentMonthlyCashflows(limit = 6) {
+    if (!Array.isArray(state.transactions) || state.transactions.length === 0) return [];
+
+    const monthMap = new Map();
+    state.transactions.forEach((t) => {
+        const amount = Number(t.amount || 0);
+        const date = new Date(t.date);
+        if (!Number.isFinite(amount) || Number.isNaN(date.getTime())) return;
+
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        if (!monthMap.has(key)) monthMap.set(key, { income: 0, expense: 0 });
+
+        const bucket = monthMap.get(key);
+        if (t.type === 'income') bucket.income += amount;
+        else if (t.type === 'expense') bucket.expense += amount;
+    });
+
+    return [...monthMap.entries()]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .slice(-limit)
+        .map(([, value]) => value.income - value.expense);
+}
+
 function updateForecastChart() {
-    const inc = getCalculatedIncome(); const exp = getTotalExpense();
-    forecastChart.data.datasets[0].data = [inc - exp, inc - (exp * 1.05), inc - (exp * 1.10)];
+    if (!forecastChart) return;
+
+    const recentCashflows = getRecentMonthlyCashflows(6);
+
+    if (recentCashflows.length === 0) {
+        const base = getCalculatedIncome() - getTotalExpense();
+        forecastChart.data.datasets[0].data = [
+            base,
+            base * 0.96,
+            base * 1.02
+        ];
+        forecastChart.update('none');
+        return;
+    }
+
+    const last = recentCashflows[recentCashflows.length - 1];
+    const avg = recentCashflows.reduce((sum, value) => sum + value, 0) / recentCashflows.length;
+    const momentum = recentCashflows.length > 1
+        ? (recentCashflows[recentCashflows.length - 1] - recentCashflows[0]) / (recentCashflows.length - 1)
+        : 0;
+    const variance = recentCashflows.reduce((sum, value) => sum + Math.pow(value - avg, 2), 0) / recentCashflows.length;
+    const volatility = Math.sqrt(variance);
+
+    const seasonalAmplitude = Math.max(volatility * 0.35, Math.abs(avg) * 0.03);
+    const projectMonth = (step) => {
+        const trend = last + (momentum * step);
+        const curve = momentum * 0.25 * (step * step);
+        const seasonal = seasonalAmplitude * Math.sin((recentCashflows.length + step) * 1.15);
+        const meanReversion = (avg - last) * (0.12 * step);
+        return Math.round((trend + curve + seasonal + meanReversion) * 100) / 100;
+    };
+
+    forecastChart.data.datasets[0].data = [
+        Math.round(last * 100) / 100,
+        projectMonth(1),
+        projectMonth(2)
+    ];
     forecastChart.update('none');
 }
 
 function updateBudgetChart() {
+    if (!budgetChart) return;
     const exp = getTotalExpense();
-    const within = state.budget > 0 ? Math.max(0, state.budget - exp) : 100;
-    const over = Math.max(0, exp - state.budget);
-    budgetChart.data.datasets[0].data = [within, over]; budgetChart.update('none');
+    if (state.budget > 0) {
+        const spent = Math.min(exp, state.budget);
+        const remaining = Math.max(0, state.budget - exp);
+        const over = Math.max(0, exp - state.budget);
+        budgetChart.data.datasets[0].data = [spent, remaining, over];
+    } else {
+        // Fallback when budget is not set: show expenses only with a minimal remainder ring.
+        const spent = Math.max(exp, 1);
+        budgetChart.data.datasets[0].data = [spent, Math.max(spent * 0.15, 1), 0];
+    }
+    budgetChart.update('none');
 }
 
 function updateNetWorthChart() {
