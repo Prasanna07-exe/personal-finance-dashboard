@@ -16,9 +16,9 @@ Site live on: https://prasanna07-exe.github.io/personal-finance-dashboard/
 
 ### Academic Context
 - This project was undertaken as part of coursework under the academic curriculum.
-- Semester: **[Update with your semester, e.g., Semester V / Semester VI]**
-- Course/Subject: **[Update with course title, e.g., Web Technologies / Frontend Development]**
-- Institution: **[Update with institution name]**
+- Semester: **Semester IV**
+- Course/Subject: **Web Programming**
+- Institution: **VITC**
 
 When listing this project on Resume/LinkedIn, include the semester and course context to reflect academic progression.
 
