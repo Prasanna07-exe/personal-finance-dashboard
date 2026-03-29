@@ -49,42 +49,6 @@ function getExpensesByCategory() {
     }, {});
 }
 
-// Returns total expenses grouped by weekday (0 = Sun ... 6 = Sat)
-function getExpensesByWeekday() {
-    const totals = [0, 0, 0, 0, 0, 0, 0];
-    (state.transactions || []).forEach(t => {
-        if (t.type !== 'expense') return;
-        const d = new Date(t.date);
-        if (!isNaN(d)) {
-            const idx = d.getDay();
-            totals[idx] += Number(t.amount || 0);
-        }
-    });
-    return totals;
-}
-
-// Counts consecutive days (up to today) with no expense transactions
-function getNoSpendStreak() {
-    const expenses = (state.transactions || []).filter(t => t.type === 'expense');
-    if (expenses.length === 0) return 0;
-
-    const expenseDays = new Set(expenses.map(e => e.date));
-    let streak = 0;
-
-    const today = new Date();
-    const earliestDate = new Date(expenses.reduce((min, e) => e.date < min ? e.date : min, expenses[0].date));
-
-    let cursor = new Date(today);
-    while (cursor >= earliestDate) {
-        const key = cursor.toISOString().split('T')[0];
-        if (expenseDays.has(key)) break;
-        streak++;
-        cursor.setDate(cursor.getDate() - 1);
-    }
-
-    return streak;
-}
-
 function detectSpendingAnomalies() {
     const expenses = state.transactions.filter(t => t.type === 'expense');
     if (expenses.length < 5) return;
