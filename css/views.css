@@ -19,6 +19,17 @@
     align-items: center;
 }
 
+.transaction-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.transaction-actions button {
+    flex: 1;
+    white-space: nowrap;
+}
+
 .table-container {
     background: var(--glass-bg);
     border-radius: 18px;
@@ -186,7 +197,35 @@ body.dark .tool-card:hover {
         text-align: center;
     }
 
+    .accounts-manager .transaction-controls {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+
+    .transactions {
+        margin: 20px 0;
+    }
+
+    .section-header h2 {
+        font-size: 1.25rem;
+    }
+
     .table-container {
         overflow-x: auto;
+    }
+
+    table {
+        font-size: 0.8rem;
+    }
+
+    th,
+    td {
+        padding: 10px 8px;
+    }
+
+    .transaction-actions {
+        width: 100%;
+        justify-content: center;
     }
 }

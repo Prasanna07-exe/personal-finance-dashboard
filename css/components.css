@@ -269,6 +269,11 @@ select:focus {
     animation-delay: 0.24s;
 }
 
+/* Stack charts vertically in Budget view for cleaner layout */
+#budget-view .charts {
+    grid-template-columns: 1fr;
+}
+
 .card,
 .input-box,
 .chart-box,
@@ -711,6 +716,27 @@ body.dark .floating-insight-content p {
         grid-template-columns: 1fr;
     }
 
+    /* Force Budget view charts to stack on smaller screens */
+    #budget-view .charts {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* 2) Reduce chart height slightly on tablets/phones */
+    .chart-wrapper {
+        height: 240px;
+    }
+
+
+@media (max-width: 768px) {
+    /* 5) Tighten vertical spacing between stacked sections on phones */
+    .cards,
+    .inputs,
+    .charts,
+    .analytics-grid {
+        gap: 16px;
+        margin-bottom: 18px;
+    }
+}
     .toggle-section {
         width: 100%;
         justify-content: flex-end;

@@ -194,10 +194,12 @@
                             <select id="filterCategory">
                                 <option value="">All Categories</option>
                             </select>
-                            <button onclick="exportCSV()">📤 Export</button>
-                            <button onclick="importCSV()" class="secondary"
-                                style="background:transparent; border:1px solid var(--glass-border);">📥 Import</button>
-                            <button onclick="showAddTransactionModal()">➕ New</button>
+                            <div class="transaction-actions">
+                                <button onclick="exportCSV()">📤 Export</button>
+                                <button onclick="importCSV()" class="secondary"
+                                    style="background:transparent; border:1px solid var(--glass-border);">📥 Import</button>
+                                <button onclick="showAddTransactionModal()">➕ New</button>
+                            </div>
                         </div>
                     </div>
                     <div class="table-container">
