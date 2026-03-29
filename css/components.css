@@ -812,16 +812,13 @@ body.dark .hamburger-btn .bar {
 @media (max-width: 768px) {
 
     /* =======================================
-       1. HEADER (Hamburger to the Right)
+        1. HEADER (Hamburger to the Right)
        ======================================= */
     .top-header {
         flex-direction: row !important;
-        /* Forces side-by-side layout */
         align-items: center !important;
         justify-content: space-between !important;
         padding: 12px 18px !important;
-
-        /* Stop the header from trapping the side drawer */
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         transform: none !important;
@@ -829,239 +826,185 @@ body.dark .hamburger-btn .bar {
         background: var(--glass-bg) !important;
     }
 
-    body.dark .top-header {
-        background: #000000 !important;
+    body.dark .top-header { background: #000000 !important; }
+    .hamburger-btn { display: flex; }
+    #viewSubtitle { display: none; }
+
+    #backToHubBtn {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        padding: 0 !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        
+        /* This hides the original "Back" text entirely */
+        font-size: 0 !important; 
+        color: transparent !important;
+        overflow: hidden !important;
+        position: relative !important;
     }
 
-    .hamburger-btn {
-        display: flex;
+    /* This places a fresh, clean arrow in the center */
+    #backToHubBtn::after {
+        content: "←" !important;
+        font-size: 1.4rem !important;
+        color: var(--text-main);
+        visibility: visible !important;
+        display: block !important;
+        line-height: 1;
     }
 
-    #viewSubtitle {
-        display: none;
+    body.dark #backToHubBtn::after {
+        color: #ffffff !important;
     }
 
     /* =======================================
-       2. REVERSED DRAWER (Slides from Left)
+        2. SIDE DRAWER (Aligned & Centered)
        ======================================= */
     .toggle-section {
-        position: fixed;
-        top: 0;
-        left: -100%;
-        /* Start off-screen to the LEFT */
-        right: auto;
-        width: 280px;
-        height: 100vh;
-        background: var(--glass-bg);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border-right: 1px solid var(--glass-border);
-        /* Border moved to right */
-        border-left: none !important;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
-        padding: 85px 24px 24px;
-        gap: 12px;
-        transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        /* Animate Left */
+        position: fixed !important;
+        top: 0 !important;
+        left: -100% !important;
+        width: 280px !important; 
+        height: 100vh !important;
+        background: var(--glass-bg) !important;
+        backdrop-filter: blur(25px) !important;
+        -webkit-backdrop-filter: blur(25px) !important;
         z-index: 99999 !important;
-        /* Boosted to stay above 3D scene */
-        box-shadow: 10px 0 40px rgba(0, 0, 0, 0.15);
-        /* Shadow falls to the right */
+        padding: 80px 20px !important;
+        
+        /* THE FIX: Stop flex-row, force vertical stacking */
+        display: block !important; 
+        overflow-y: auto !important;
+        text-align: center !important;
     }
 
-    /* Open State for the Drawer */
     .toggle-section.open {
-        left: 0;
+        left: 0 !important;
     }
 
-    body.dark .toggle-section {
-        background: rgba(10, 10, 10, 0.95) !important;
-        border-right: 1px solid #262626 !important;
-        border-left: none !important;
+    /* Top Buttons (Report, Tools, Help) */
+    .toggle-section > button {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 auto 12px auto !important;
     }
 
-    /* Morphing Hamburger into an 'X' */
-    .hamburger-btn.open .bar:nth-child(1) {
-        transform: translateY(8px) rotate(45deg);
+    /* The Theme Toggle Emoji */
+    #themeToggleBtn {
+        display: inline-flex !important;
+        margin: 20px auto !important;
+        font-size: 2rem !important;
+        background: transparent !important;
+        border: none !important;
+        float: none !important; /* Ensure no floating */
     }
 
-    .hamburger-btn.open .bar:nth-child(2) {
-        opacity: 0;
-    }
-
-    .hamburger-btn.open .bar:nth-child(3) {
-        transform: translateY(-8px) rotate(-45deg);
-    }
-
-    /* Fallback Mobile Navigation Styling */
+    /* The Navigation Section: FORCE BELOW THE TOGGLE */
     .mobile-only-nav {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-top: 15px;
-        border-top: 1px solid rgba(148, 163, 184, 0.3);
-        padding-top: 15px;
+        display: block !important; /* Block ensures it starts on a new line */
+        width: 100% !important;
+        margin-top: 10px !important;
+        padding-top: 20px !important;
+        border-top: 1px solid rgba(148, 163, 184, 0.2);
+        clear: both !important; /* Clears any side-by-side float behavior */
     }
 
     .nav-label {
+        display: block !important;
+        margin-bottom: 15px !important;
         font-size: 0.75rem;
         color: var(--text-muted);
         text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 5px;
-        font-weight: bold;
+        text-align: center;
     }
 
+    /* The Nav List Buttons */
     .mobile-only-nav .nav-btn {
-        background: rgba(255, 255, 255, 0.4) !important;
-        color: var(--text-main) !important;
-        text-align: left;
-        padding: 12px 16px;
-        border: 1px solid var(--glass-border) !important;
-        font-weight: 600;
-    }
-
-    body.dark .mobile-only-nav {
-        border-top-color: #333;
-    }
-
-    body.dark .mobile-only-nav .nav-btn {
-        background: #111 !important;
-        color: #fff !important;
-        border-color: #333 !important;
+        display: flex !important;
+        width: 100% !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+        gap: 15px;
+        padding: 14px 20px !important;
+        margin-bottom: 10px !important;
+        border-radius: 12px !important;
+        font-size: 0.95rem !important;
     }
 
     /* =======================================
-       3. NATIVE APP LAYOUT: HERO + GRID
+        3. NATIVE APP LAYOUT: HERO + GRID
        ======================================= */
-
-    /* Turn the 3D container into a responsive Grid */
     .hero-3d-container {
-        padding-bottom: 90px !important; 
-        gap: 14px !important;
+        padding-bottom: 30px !important; 
         display: grid !important;
-        grid-template-columns: 1fr 1fr;
-        /* 2 clean columns */
-        gap: 12px;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
         height: auto !important;
-        /* Let it expand naturally */
         min-height: unset !important;
-        padding-bottom: 30px;
         background: transparent !important;
         border-radius: 0 !important;
     }
 
-    /* Make the Spline scene a "Hero" graphic spanning the top */
     #spline-wrapper {
         grid-column: 1 / -1;
-        /* Stretch across both columns */
         position: relative !important;
-        top: 0 !important;
         height: 35vh !important;
-        /* Locks the 3D size */
         min-height: 280px;
-        z-index: 1 !important;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
 
-    /* Transform the floating nodes into standard app buttons */
     .node-orbit {
         position: relative !important;
         top: auto !important;
         left: auto !important;
         transform: none !important;
-        /* Stop orbital positioning */
         animation: none !important;
-        /* Stop floating animation */
         width: 100% !important;
-        margin: 0 !important;
-        padding: 16px 12px !important;
+        padding: 16px 10px !important;
         justify-content: center;
-        text-align: center;
         border-radius: 14px !important;
         font-size: 0.85rem !important;
-        background: var(--glass-bg) !important;
-        border: 1px solid var(--glass-border) !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
-        white-space: normal;
     }
 
-    /* Add a subtle 'tap' effect for mobile users */
-    .node-orbit:active {
-        transform: scale(0.96) !important;
-        background: rgba(255, 255, 255, 0.6) !important;
-    }
-
-    body.dark .node-orbit {
-        background: #111 !important;
-        border-color: #333 !important;
-    }
-
-    /* Erase the old positioning classes */
-    .pos-1,
-    .pos-2,
-    .pos-3,
-    .pos-4,
-    .pos-5,
-    .pos-6,
-    .pos-7,
-    .pos-8 {
-        top: auto;
-        left: auto;
-    }
     .mobile-quick-add {
-        grid-column: 1 / -1; /* Forces it to span across both columns */
-        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%) !important; /* Premium Success Green */
+        grid-column: 1 / -1;
+        background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
         color: #ffffff !important;
-        border: none !important;
-        border-radius: 16px !important;
         padding: 18px !important;
-        font-size: 1.05rem !important;
+        border-radius: 16px !important;
         font-weight: bold !important;
-        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25) !important;
-        margin-top: 10px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .mobile-quick-add:active {
-        transform: scale(0.97) !important;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+    /* =======================================
+        4. GLOBAL FIXES (Missing from your code)
+       ======================================= */
+    /* Stack all cards/inputs vertically so they aren't squished */
+    .cards, .inputs, .charts, .analytics-grid {
+        grid-template-columns: 1fr !important;
     }
-}
+    
+    .table-container {
+        overflow-x: auto !important; /* Enables horizontal scroll for large tables */
+    }
 
-/* ==============================================================
-   MOBILE MENU OVERLAY (FROSTED BACKDROP)
-   ============================================================== */
+} /* END OF MEDIA QUERY - Boyfriend Protection Lock */
 
+/* KEEP THESE OUTSIDE THE MEDIA QUERY */
 .menu-overlay {
     position: fixed;
     inset: 0;
-    /* shorthand for top:0, right:0, bottom:0, left:0 */
     background: rgba(15, 23, 42, 0.3);
-    /* Subtle dark tint */
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     z-index: 999;
-    /* Sits directly below the drawer (which is 1000) */
-
-    /* Hidden state */
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease-in-out;
 }
 
-/* Active State */
-.menu-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Dark Mode Adjustment */
-body.dark .menu-overlay {
-    background: rgba(0, 0, 0, 0.6);
-}
+.menu-overlay.active { opacity: 1; visibility: visible; }
+body.dark .menu-overlay { background: rgba(0, 0, 0, 0.6); }
