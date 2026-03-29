@@ -20,7 +20,6 @@ Site live on: https://prasanna07-exe.github.io/personal-finance-dashboard/
 - Course/Subject: **Web Programming**
 - Institution: **VITC**
 
-When listing this project on Resume/LinkedIn, include the semester and course context to reflect academic progression.
 
 ### Key Highlights
 - 🎨 **Beautiful UI** with glassmorphism design and dark mode
